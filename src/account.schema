@@ -22,7 +22,7 @@ model Organization {
   roles     OrganizationRole[]
   users     User[]
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model OrganizationRole {
@@ -36,7 +36,7 @@ model OrganizationRole {
   organizationId String?       @db.Uuid
 
   @@unique([name, organizationId])
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model User {
@@ -57,14 +57,14 @@ model User {
   organization   Organization?      @relation(fields: [organizationId], references: [id])
   organizationId String?            @db.Uuid
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 enum UserStatus {
   ACTIVE
   INACTIVE
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model UserSingleProfile {
@@ -89,7 +89,7 @@ model UserSingleProfile {
   userId      String             @unique @db.Uuid
 
   @@index([userId])
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model UserMultiProfile {
@@ -115,7 +115,7 @@ model UserMultiProfile {
   userId         String             @db.Uuid
 
   @@index([userId])
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 enum UserProfileGender {
@@ -123,7 +123,7 @@ enum UserProfileGender {
   Female
   Intersex
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model Role {
@@ -135,7 +135,7 @@ model Role {
   updatedAt   DateTime @updatedAt
   users       User[]
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model Permission {
@@ -151,7 +151,7 @@ model Permission {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 enum PermissionAction {
@@ -162,7 +162,7 @@ enum PermissionAction {
   Update
   Delete
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 enum TrustedEntityType {
@@ -170,7 +170,7 @@ enum TrustedEntityType {
   ROLE
   USER
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model VerificationCode {
@@ -184,14 +184,14 @@ model VerificationCode {
   createdAt DateTime               @default(now())
   updatedAt DateTime               @updatedAt
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 enum VerificationCodeStatus {
   ACTIVE
   INACTIVE
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 enum VerificationCodeUse {
@@ -210,7 +210,7 @@ enum VerificationCodeUse {
   CHANGE_PASSWORD
   RESET_PASSWORD
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model VerificationCodeEmail {
@@ -222,7 +222,7 @@ model VerificationCodeEmail {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model VerificationCodeSms {
@@ -234,7 +234,7 @@ model VerificationCodeSms {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model AccessToken {
@@ -244,7 +244,7 @@ model AccessToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
 
 model RefreshToken {
@@ -254,5 +254,5 @@ model RefreshToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@schema("microservice/account")
+  @@schema("microservice/newbie.account/src")
 }
