@@ -36,14 +36,21 @@ export async function userPrismaMiddleware(
         }
 
         if (params.args['data']['profile']) {
-          params.args['data']['profile'][params.action]['fullName'] =
-            params.args['data']['profile'][params.action]['firstName'] +
+          let profileAction = '';
+          if ('create' in params.args['data']['profile']) {
+            profileAction = 'create';
+          } else if ('update' in params.args['data']['profile']) {
+            profileAction = 'update';
+          }
+
+          params.args['data']['profile'][profileAction]['fullName'] =
+            params.args['data']['profile'][profileAction]['firstName'] +
             ' ' +
-            (params.args['data']['profile'][params.action]['middleName']
-              ? params.args['data']['profile'][params.action]['middleName'] +
+            (params.args['data']['profile'][profileAction]['middleName']
+              ? params.args['data']['profile'][profileAction]['middleName'] +
                 ' '
               : '') +
-            params.args['data']['profile'][params.action]['lastName'];
+            params.args['data']['profile'][profileAction]['lastName'];
         }
         return next(params);
       default:
