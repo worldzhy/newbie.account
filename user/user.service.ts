@@ -13,7 +13,7 @@ export class UserService {
   /**
    * The account supports uuid / email / phone.
    */
-  async findByAccount(account: string): Promise<User | null> {
+  async findByAccount(account: string) {
     if (verifyUuid(account)) {
       return await this.prisma.user.findUnique({where: {id: account}});
     } else {

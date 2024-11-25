@@ -1,22 +1,19 @@
 import {Controller, Post, Body, Res, NotFoundException} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
+import {AccessToken, VerificationCodeUse} from '@prisma/client';
 import {Response} from 'express';
 import {AccountService} from './account.service';
-import {GuardByVerificationCode} from './security/passport/verification-code/verification-code.decorator';
-import {AccessToken, VerificationCodeUse} from '@prisma/client';
+import {verifyEmail, verifyPhone} from './account.validator';
 import {NoGuard} from './security/passport/public/public.decorator';
+import {GuardByVerificationCode} from './security/passport/verification-code/verification-code.decorator';
+import {UserService} from './user/user.service';
+import {VerificationCodeService} from './verification-code/verification-code.service';
 import {
   NewbieException,
   NewbieExceptionType,
 } from '@framework/exceptions/newbie.exception';
-import {
-  verifyEmail,
-  verifyPhone,
-} from '@microservices/account/account.validator';
-import {UserService} from './user/user.service';
-import {VerificationCodeService} from './verification-code/verification-code.service';
-import {VerificationCodeEmailService} from './verification-code/email.service';
-import {VerificationCodeSmsService} from './verification-code/sms.service';
+import {EmailService} from '@microservices/notification/email/email.service';
+import {SmsService} from '@microservices/notification/sms/sms.service';
 
 @ApiTags('Account')
 @Controller('account')
@@ -25,8 +22,8 @@ export class LoginByVerificationCodeController {
     private readonly accountService: AccountService,
     private readonly userService: UserService,
     private readonly verificationCodeService: VerificationCodeService,
-    private readonly emailService: VerificationCodeEmailService,
-    private readonly smsService: VerificationCodeSmsService
+    private readonly emailService: EmailService,
+    private readonly smsService: SmsService
   ) {}
 
   // *
@@ -64,11 +61,6 @@ export class LoginByVerificationCodeController {
     @Body() body: {email?: string; phone?: string; use: VerificationCodeUse}
   ): Promise<{secondsOfCountdown: number}> {
     if (body.email && verifyEmail(body.email)) {
-      // return await this.accountService.sendVerificationCode({
-      //   email: body.email,
-      //   use: body.use,
-      // });
-
       // [step 1] Check if the account exists.
       const user = await this.userService.findByAccount(body.email);
       if (!user) {
@@ -83,15 +75,15 @@ export class LoginByVerificationCodeController {
         );
 
       // [step 3] Send verification code.
-      await this.emailService.send({
-        email: body.email,
-        subject: 'Your Verificaiton Code',
-        plainText:
-          verificationCode.code +
-          ' is your verification code valid for the next 10 minutes.',
-        html:
-          verificationCode.code +
-          ' is your verification code valid for the next 10 minutes.',
+      await this.emailService.sendWithTemplate({
+        toAddress: body.email,
+        template: {
+          'auth/verification-code': {
+            userName: 'Dear',
+            code: verificationCode.code,
+            codeValidMinutes: 10,
+          },
+        },
       });
     } else if (body.phone && verifyPhone(body.phone)) {
       // [step 1] Check if the account exists.

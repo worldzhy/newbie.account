@@ -21,9 +21,6 @@ import {AccountService} from './account.service';
 import {RoleService} from './role/role.service';
 import {UserService} from './user/user.service';
 import {VerificationCodeService} from './verification-code/verification-code.service';
-import {VerificationCodeEmailService} from './verification-code/email.service';
-import {VerificationCodeSmsService} from './verification-code/sms.service';
-import {AwsPinpointService} from './verification-code/aws.pinpoint.service';
 
 @Global()
 @Module({
@@ -49,9 +46,6 @@ import {AwsPinpointService} from './verification-code/aws.pinpoint.service';
     RoleService,
     UserService,
     VerificationCodeService,
-    VerificationCodeEmailService,
-    VerificationCodeSmsService,
-    AwsPinpointService,
   ],
   exports: [AccountService, RoleService, UserService, VerificationCodeService],
 })
