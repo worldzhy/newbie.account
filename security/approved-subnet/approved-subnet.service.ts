@@ -3,7 +3,6 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {ConfigService} from '@nestjs/config';
 import type {Prisma} from '@prisma/client';
 import {ApprovedSubnet} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
@@ -20,7 +19,6 @@ import {compareHash, generateHash} from '@framework/utilities/common.util';
 export class ApprovedSubnetService {
   constructor(
     private prisma: PrismaService,
-    private configService: ConfigService,
     private geolocationService: GeolocationService
   ) {}
 
