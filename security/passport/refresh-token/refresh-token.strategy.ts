@@ -2,9 +2,9 @@ import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-custom';
 import {Request} from 'express';
-import {RefreshTokenService} from '@microservices/account/security/token/refresh-token.service';
-import {TokenService} from '../../token/token.service';
 import {PrismaService} from '@framework/prisma/prisma.service';
+import {SessionService} from '../../session/session.service';
+import {TokenService} from '../../token/token.service';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -13,7 +13,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
 ) {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly refreshTokenService: RefreshTokenService,
+    private readonly sessionService: SessionService,
     private readonly tokenService: TokenService
   ) {
     super();
@@ -25,36 +25,19 @@ export class RefreshTokenStrategy extends PassportStrategy(
   async validate(req: Request): Promise<boolean> {
     const refreshToken = req.cookies.refreshToken;
 
-    // [step 1] Validate refresh token.
+    // [step 1] Verify that refresh token is in db
     try {
-      this.refreshTokenService.verifyToken(refreshToken);
-    } catch (err: unknown) {
-      if (err instanceof Error && err.name === 'TokenExpiredError') {
-        // If expired refresh token is used, invalidate all tokens to force user to login
-        const userData = this.refreshTokenService.decodeToken(refreshToken) as {
-          userId: string;
-        };
-        await this.tokenService.invalidateAccessTokenAndRefreshToken(
-          userData.userId
-        );
-      }
+      await this.prisma.session.findFirstOrThrow({where: {refreshToken}});
+    } catch (error) {
       throw new UnauthorizedException('Token is incorrect.');
     }
 
-    // [step 2] Verify that refresh token is in db
+    // [step 2] Validate refresh token.
     try {
-      await this.prisma.refreshToken.findFirstOrThrow({
-        where: {token: refreshToken},
-      });
-    } catch (err: unknown) {
-      // If refresh token is valid but not in db must have logout already and bad actor might be trying to use it, invalidate all tokens to force user to login
-      const userData = this.refreshTokenService.decodeToken(refreshToken) as {
-        userId: string;
-      };
-      await this.tokenService.invalidateAccessTokenAndRefreshToken(
-        userData.userId
-      );
-      throw new UnauthorizedException('Token is incorrect.');
+      this.tokenService.verifyUserRefreshToken(refreshToken);
+    } catch (error: unknown) {
+      await this.sessionService.destroy(refreshToken);
+      throw new UnauthorizedException('Token is expired.');
     }
 
     return true;

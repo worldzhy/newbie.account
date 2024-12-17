@@ -7,6 +7,7 @@ import {
   NewbieException,
   NewbieExceptionType,
 } from '@framework/exceptions/newbie.exception';
+import {UserStatus} from '@prisma/client';
 
 @Injectable()
 export class PasswordStrategy extends PassportStrategy(
@@ -26,25 +27,30 @@ export class PasswordStrategy extends PassportStrategy(
    * [3] phone
    *
    */
-  async validate(account: string, password: string): Promise<boolean> {
+  async validate(account: string, password: string): Promise<{userId: string}> {
     // [step 1] Get the user.
     const user = await this.userService.findByAccount(account);
     if (!user) {
       throw new NewbieException(NewbieExceptionType.Login_WrongInput);
     }
 
-    // [step 2] Handle no password situation.
+    // [step 2] Check if the account is active.
+    if (user.status === UserStatus.INACTIVE) {
+      throw new NewbieException(NewbieExceptionType.Login_InactiveUser);
+    }
+
+    // [step 3] Handle no password situation.
     if (!user.password) {
       throw new NewbieException(NewbieExceptionType.Login_NoPassword);
     }
 
-    // [step 3] Validate password.
+    // [step 4] Validate password.
     const match = await compareHash(password, user.password);
     if (match !== true) {
       throw new NewbieException(NewbieExceptionType.Login_WrongInput);
     }
 
-    // [step 4] OK.
-    return true;
+    // [step 5] OK.
+    return {userId: user.id};
   }
 }

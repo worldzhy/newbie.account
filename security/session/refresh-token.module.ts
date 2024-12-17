@@ -1,7 +1,7 @@
 import {Global, Module} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {JwtModule} from '@nestjs/jwt';
-import {AccessTokenService} from './access-token.service';
+import {UserRefreshTokenService} from './refresh-token.service';
 
 @Global()
 @Module({
@@ -10,17 +10,17 @@ import {AccessTokenService} from './access-token.service';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.getOrThrow<string>(
-          'microservices.account.token.userAccess.secret'
+          'microservices.account.token.userRefresh.secret'
         ),
         signOptions: {
           expiresIn: config.getOrThrow<string>(
-            'microservices.account.token.userAccess.expiresIn'
+            'microservices.account.token.userRefresh.expiresIn'
           ),
         },
       }),
     }),
   ],
-  providers: [AccessTokenService],
-  exports: [AccessTokenService],
+  providers: [UserRefreshTokenService],
+  exports: [UserRefreshTokenService],
 })
-export class AccessTokenModule {}
+export class UserRefreshTokenModule {}

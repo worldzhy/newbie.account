@@ -21,7 +21,9 @@ export async function userPrismaMiddleware(
           }
           params.args['data']['email'] = (
             params.args['data']['email'] as string
-          ).toLowerCase();
+          )
+            .toLowerCase()
+            .trim();
         }
 
         if (params.args['data']['password']) {
@@ -35,45 +37,11 @@ export async function userPrismaMiddleware(
           params.args['data']['password'] = hash;
         }
 
-        if (params.args['data']['profile']) {
-          let profileAction = '';
-          if ('create' in params.args['data']['profile']) {
-            profileAction = 'create';
-          } else if ('update' in params.args['data']['profile']) {
-            profileAction = 'update';
-          }
-
-          params.args['data']['profile'][profileAction]['fullName'] =
-            params.args['data']['profile'][profileAction]['firstName'] +
-            ' ' +
-            (params.args['data']['profile'][profileAction]['middleName']
-              ? params.args['data']['profile'][profileAction]['middleName'] +
-                ' '
-              : '') +
-            params.args['data']['profile'][profileAction]['lastName'];
-        }
-        return next(params);
-      default:
-        return next(params);
-    }
-  } else if (
-    params.model === Prisma.ModelName.UserSingleProfile ||
-    params.model === Prisma.ModelName.UserMultiProfile
-  ) {
-    switch (params.action) {
-      case 'create':
-      case 'update':
-        if (params.args['data']['dateOfBirth']) {
-          params.args['data']['dateOfBirth'] = new Date(
-            params.args['data']['dateOfBirth'].toString()
-          );
-        }
-
         if (
           params.args['data']['firstName'] &&
           params.args['data']['lastName']
         ) {
-          params.args['data']['fullName'] =
+          params.args['data']['name'] =
             params.args['data']['firstName'] +
             ' ' +
             (params.args['data']['middleName']
@@ -81,7 +49,15 @@ export async function userPrismaMiddleware(
               : '') +
             params.args['data']['lastName'];
         }
+
+        if (params.args['data']['dateOfBirth']) {
+          params.args['data']['dateOfBirth'] = new Date(
+            params.args['data']['dateOfBirth'].toString()
+          );
+        }
+
         return next(params);
+
       default:
         return next(params);
     }

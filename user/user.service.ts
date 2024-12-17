@@ -1,7 +1,11 @@
 import {Injectable} from '@nestjs/common';
 import {User} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {verifyUuid} from '@microservices/account/account.validator';
+import {
+  verifyEmail,
+  verifyPhone,
+  verifyUuid,
+} from '@microservices/account/account.validator';
 import {userPrismaMiddleware} from './user.prisma.middleware';
 
 @Injectable()
@@ -11,21 +15,15 @@ export class UserService {
   }
 
   /**
-   * The account supports uuid / email / phone.
+   * The account supports username / email / phone.
    */
   async findByAccount(account: string) {
-    if (verifyUuid(account)) {
-      return await this.prisma.user.findUnique({where: {id: account}});
+    if (verifyEmail(account)) {
+      return await this.prisma.user.findUnique({where: {email: account}});
+    } else if (verifyPhone(account)) {
+      return await this.prisma.user.findUnique({where: {phone: account}});
     } else {
-      const users = await this.prisma.user.findMany({
-        where: {
-          OR: [
-            {email: {equals: account, mode: 'insensitive'}},
-            {phone: account},
-          ],
-        },
-      });
-      return users.length > 0 ? (users[0] as User) : null;
+      return await this.prisma.user.findUnique({where: {username: account}});
     }
   }
 

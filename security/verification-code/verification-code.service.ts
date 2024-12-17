@@ -17,13 +17,13 @@ export class VerificationCodeService {
   public resendMinutes: number; // The verification code can be resend after y minute.
 
   constructor(
-    private readonly configService: ConfigService,
+    private readonly config: ConfigService,
     private readonly prisma: PrismaService
   ) {
-    this.timeoutMinutes = this.configService.getOrThrow<number>(
+    this.timeoutMinutes = this.config.getOrThrow<number>(
       'microservices.account.verificationCode.timeoutMinutes'
     );
-    this.resendMinutes = this.configService.getOrThrow<number>(
+    this.resendMinutes = this.config.getOrThrow<number>(
       'microservices.account.verificationCode.resendMinutes'
     );
   }

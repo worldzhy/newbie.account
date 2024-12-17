@@ -9,12 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {
-  Permission,
-  PermissionAction,
-  Prisma,
-  TrustedEntityType,
-} from '@prisma/client';
+import {Permission, PermissionAction, Prisma} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 
 @ApiTags('Account / Permission')
@@ -43,8 +38,7 @@ export class PermissionController {
           resource: Prisma.ModelName.User,
           action: PermissionAction.Get,
           where: {state: {in: ['StateA', 'StateB']}},
-          trustedEntityType: TrustedEntityType.USER,
-          trustedEntityId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
+          trustedUserId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
         },
       },
     },
@@ -101,10 +95,9 @@ export class PermissionController {
       a: {
         summary: '1. Update name',
         value: {
-          resource: Prisma.ModelName.Role,
+          resource: Prisma.ModelName.User,
           action: PermissionAction.Update,
-          trustedEntityType: TrustedEntityType.USER,
-          trustedEntityId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
+          trustedUserId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
         },
       },
     },

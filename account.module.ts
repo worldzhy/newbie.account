@@ -2,51 +2,59 @@ import {Global, Module} from '@nestjs/common';
 
 import {SecurityModule} from './security/security.module';
 
+import {AuditLogController} from './audit-logs/audit-log.controller';
 import {LoginByPasswordController} from './login-by-password.controller';
 import {LoginByProfileController} from './login-by-profile.controller';
 import {LoginByVerificationCodeController} from './login-by-verificationcode.controller';
 import {LoginRefreshController} from './login-refresh.controller';
 import {LogoutController} from './logout.controller';
 import {MeController} from './me.controller';
+import {MembershipController} from './membership/membership.controller';
 import {PasswordController} from './password.controller';
 import {SignupController} from './signup.controller';
 
 import {OrganizationController} from '../../microservices/account/organization/organization.controller';
 import {PermissionController} from '../../microservices/account/permission/permission.controller';
-import {RoleController} from '../../microservices/account/role/role.controller';
 import {UserController} from '../../microservices/account/user/user.controller';
-import {UserProfileController} from './user/user-profile.controller';
 
 import {AccountService} from './account.service';
-import {RoleService} from './role/role.service';
+import {ApiKeyService} from './api-key/api-key.service';
+import {GeolocationService} from './geolocation/geolocation.service';
+import {MembershipService} from './membership/membership.service';
 import {UserService} from './user/user.service';
-import {VerificationCodeService} from './verification-code/verification-code.service';
 
 @Global()
 @Module({
   imports: [SecurityModule],
   controllers: [
+    AuditLogController,
     LoginByPasswordController,
     LoginByProfileController,
     LoginByVerificationCodeController,
     LoginRefreshController,
     LogoutController,
     MeController,
+    MembershipController,
     PasswordController,
     SignupController,
 
     OrganizationController,
     PermissionController,
-    RoleController,
     UserController,
-    UserProfileController,
   ],
   providers: [
     AccountService,
-    RoleService,
+    ApiKeyService,
+    GeolocationService,
+    MembershipService,
     UserService,
-    VerificationCodeService,
   ],
-  exports: [AccountService, RoleService, UserService, VerificationCodeService],
+  exports: [
+    AccountService,
+    ApiKeyService,
+    GeolocationService,
+    MembershipService,
+    UserService,
+  ],
 })
 export class AccountModule {}

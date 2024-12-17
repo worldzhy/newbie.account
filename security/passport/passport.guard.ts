@@ -14,6 +14,8 @@ import {IS_LOGGING_IN_PROFILE_KEY} from './profile/profile.decorator';
 import {IS_LOGGING_IN_UUID_KEY} from './uuid/uuid.decorator';
 import {IS_LOGGING_IN_VERIFICATION_CODE_KEY} from './verification-code/verification-code.decorator';
 import {IS_REFRESHING_ACCESS_TOKEN} from './refresh-token/refresh-token.decorator';
+import {IS_LOGGING_IN_APIKEY_KEY} from './api-key/api-key.decorator';
+import {ApiKeyAuthGuard} from './api-key/api-key.guard';
 
 @Injectable()
 export class PassportGuard extends AuthGuard('authentication') {
@@ -38,6 +40,15 @@ export class PassportGuard extends AuthGuard('authentication') {
     );
     if (isLoggingInByPassword) {
       return new PasswordAuthGuard().canActivate(context);
+    }
+
+    // Use @GuardByApiKey() for custom.api-key endpoint authentication
+    const isLoggingInByApiKey = this.reflector.getAllAndOverride<boolean>(
+      IS_LOGGING_IN_APIKEY_KEY,
+      [context.getHandler(), context.getClass()]
+    );
+    if (isLoggingInByApiKey) {
+      return new ApiKeyAuthGuard().canActivate(context);
     }
 
     // Use @GuardByProfile() for custom.profile strategy authentication

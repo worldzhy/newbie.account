@@ -1,21 +1,16 @@
 import {Injectable, CanActivate, ExecutionContext} from '@nestjs/common';
 import {Reflector} from '@nestjs/core';
-import {
-  PermissionAction,
-  Prisma,
-  Role,
-  TrustedEntityType,
-} from '@prisma/client';
+import {PermissionAction, Prisma} from '@prisma/client';
 import {PERMISSION_KEY} from './authorization.decorator';
-import {AccessTokenService} from '@microservices/account/security/token/access-token.service';
 import {PrismaService} from '@framework/prisma/prisma.service';
+import {TokenService} from '../token/token.service';
 
 @Injectable()
 export class AuthorizationGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
     private readonly prisma: PrismaService,
-    private readonly accessTokenService: AccessTokenService
+    private readonly tokenService: TokenService
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -31,55 +26,41 @@ export class AuthorizationGuard implements CanActivate {
 
     // [step 2] Parse JWT.
     const req = context.switchToHttp().getRequest();
-    const accessToken = this.accessTokenService.getTokenFromHttpRequest(req);
+    const accessToken = this.tokenService.getTokenFromHttpRequest(req);
     if (accessToken === undefined) {
       return false;
     }
-    const payload = this.accessTokenService.decodeToken(accessToken) as {
-      userId: string;
-      sub: string;
-    };
+    const payload = this.tokenService.verifyUserAccessToken(accessToken);
 
     // [step 3] Get user with organization and roles.
     const user = await this.prisma.user.findUniqueOrThrow({
       where: {id: payload.userId},
-      include: {roles: true, profiles: true},
+      include: {memberships: true},
     });
 
     // [step 4-1] Get organization permissions.
-    for (let i = 0; i < user.profiles.length; i++) {
-      const profile = user.profiles[i];
-      if (profile.organizationId) {
-        const organizationPermissions = await this.prisma.permission.findMany({
-          where: {
-            trustedEntityType: TrustedEntityType.ORGANIZATION,
-            trustedEntityId: profile.organizationId,
-          },
-        });
+    for (let i = 0; i < user.memberships.length; i++) {
+      const organizationPermissions = await this.prisma.permission.findMany({
+        where: {trustedMembershipId: user.memberships[i].id},
+      });
 
-        for (let i = 0; i < organizationPermissions.length; i++) {
-          const permission = organizationPermissions[i];
-          if (
-            permission.resource === requiredPermission.resource &&
-            (permission.action === requiredPermission.action ||
-              permission.action === PermissionAction.Manage)
-          ) {
-            return true;
-          }
+      for (let i = 0; i < organizationPermissions.length; i++) {
+        const permission = organizationPermissions[i];
+        if (
+          permission.resource === requiredPermission.resource &&
+          (permission.action === requiredPermission.action ||
+            permission.action === PermissionAction.Manage)
+        ) {
+          return true;
         }
       }
     }
 
     // [step 4-2] Get roles' permissions.
-    const roleIds = user.roles.map((role: Role) => {
-      return role.id;
-    });
-    if (roleIds) {
+
+    if (user.roles.length > 0) {
       const rolePermissions = await this.prisma.permission.findMany({
-        where: {
-          trustedEntityType: TrustedEntityType.ROLE,
-          trustedEntityId: {in: roleIds},
-        },
+        where: {trustedUserRole: {in: user.roles}},
       });
 
       for (let i = 0; i < rolePermissions.length; i++) {
@@ -96,10 +77,7 @@ export class AuthorizationGuard implements CanActivate {
 
     // [step 4-3] Get user's permissions.
     const userPermissions = await this.prisma.permission.findMany({
-      where: {
-        trustedEntityType: TrustedEntityType.USER,
-        trustedEntityId: user.id,
-      },
+      where: {trustedUserId: user.id},
     });
 
     for (let i = 0; i < userPermissions.length; i++) {

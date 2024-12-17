@@ -1,19 +1,18 @@
 import {Controller, Get, Res} from '@nestjs/common';
 import {ApiTags, ApiCookieAuth} from '@nestjs/swagger';
 import {Response} from 'express';
-import {RefreshTokenService} from './security/token/refresh-token.service';
-import {TokenService} from './security/token/token.service';
 import {GuardByRefreshToken} from './security/passport/refresh-token/refresh-token.decorator';
-// import {Cookies} from '@framework/decorators/cookie.decorator';
-import {AccessToken} from '@prisma/client';
 import {Cookies} from '@framework/decorators/cookie.decorator';
-import {secondsUntilUnixTimestamp} from '@framework/utilities/datetime.util';
+import {SessionService} from './security/session/session.service';
+import {UserRefreshTokenService} from './security/session/refresh-token.service';
+import {TokenService} from './security/token/token.service';
 
 @ApiTags('Account')
 @Controller('account')
 export class LoginRefreshController {
   constructor(
-    private readonly refreshTokenService: RefreshTokenService,
+    private readonly userRefreshTokenService: UserRefreshTokenService,
+    private readonly sessionService: SessionService,
     private readonly tokenService: TokenService
   ) {}
 
@@ -23,32 +22,28 @@ export class LoginRefreshController {
   async refresh(
     @Cookies('refreshToken') refreshToken: string,
     @Res({passthrough: true}) response: Response
-  ): Promise<AccessToken> {
-    // [step 1] Validate refresh token
-    const tokenInfo = this.refreshTokenService.decodeToken(refreshToken) as {
-      userId: string;
-      sub: string;
-      exp: number; // The timestamp of expiresIn. It is a future timestamp.
-    };
+  ) {
+    // [step 1]  Refresh
+    const session = await this.sessionService.refresh(refreshToken);
 
-    // [step 2] Invalidate existing tokens
-    await this.tokenService.invalidateAccessTokenAndRefreshToken(
-      tokenInfo.userId
+    // [step 2] Send refresh token to cookie.
+    const cookie = {
+      name: this.userRefreshTokenService.cookieName,
+      options: this.userRefreshTokenService.getCookieOptions(
+        session.refreshToken
+      ),
+    };
+    response.cookie(cookie.name, session.refreshToken, cookie.options);
+
+    // [step 3] Send access token as response.
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(
+      session.accessToken
     );
 
-    // [step 3] Generate new tokens
-    const {accessToken, refreshToken: newRefreshToken} =
-      await this.tokenService.generateAccessTokenAndRefreshToken(
-        {userId: tokenInfo.userId, sub: tokenInfo.sub},
-        {expiresIn: secondsUntilUnixTimestamp(tokenInfo.exp)}
-      );
-
-    // [step 4] Send refresh token to cookie.
-    const {token, cookie} = newRefreshToken;
-    response.cookie(cookie.name, token, cookie.options);
-
-    // [step 5] Send access token as response.
-    return accessToken;
+    return {
+      token: session.accessToken,
+      tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
+    };
   }
 
   /* End */
