@@ -14,7 +14,7 @@ export class UuidStrategy extends PassportStrategy(Strategy, 'custom.uuid') {
   /**
    * 'validate' function must be implemented.
    */
-  async validate(req: Request): Promise<boolean> {
+  async validate(req: Request): Promise<{userId: string}> {
     // [step 1] Guard statement.
     const uuid = req.body.uuid;
     if (!verifyUuid(uuid)) {
@@ -30,6 +30,6 @@ export class UuidStrategy extends PassportStrategy(Strategy, 'custom.uuid') {
     }
 
     // [step 3] OK.
-    return true;
+    return {userId: user.id};
   }
 }

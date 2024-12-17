@@ -1,7 +1,7 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-local';
-import {VerificationCodeService} from '@microservices/account/verification-code/verification-code.service';
+import {VerificationCodeService} from '@microservices/account/security/verification-code/verification-code.service';
 import {UserService} from '@microservices/account/user/user.service';
 import {
   verifyEmail,
@@ -28,7 +28,10 @@ export class VerificationCodeStrategy extends PassportStrategy(
    * [2] phone
    *
    */
-  async validate(account: string, verificationCode: string): Promise<boolean> {
+  async validate(
+    account: string,
+    verificationCode: string
+  ): Promise<{userId: string}> {
     // [step 1] Get the user.
     const user = await this.userService.findByAccount(account);
     if (!user) {
@@ -51,10 +54,10 @@ export class VerificationCodeStrategy extends PassportStrategy(
           account
         );
     if (!isCodeValid) {
-      return false;
+      throw new UnauthorizedException('Invalid code.');
     }
 
     // [Step 4] OK.
-    return true;
+    return {userId: user.id};
   }
 }

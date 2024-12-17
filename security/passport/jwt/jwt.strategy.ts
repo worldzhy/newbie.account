@@ -1,17 +1,17 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {PassportStrategy} from '@nestjs/passport';
 import {ExtractJwt, Strategy} from 'passport-jwt';
 import {Request} from 'express';
-import {AccessTokenService} from '@microservices/account/security/token/access-token.service';
 import {PrismaService} from '@framework/prisma/prisma.service';
+import {TokenService} from '../../token/token.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
-    private readonly accessTokenService: AccessTokenService
+    private readonly tokenService: TokenService
   ) {
     const secret = config.getOrThrow<string>(
       'microservices.account.token.userAccess.secret'
@@ -35,15 +35,21 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     req: Request,
     payload: {userId: string; sub: string; iat: number; exp: number}
   ) {
-    const accessToken = this.accessTokenService.getTokenFromHttpRequest(req);
-    const count = await this.prisma.accessToken.count({
-      where: {token: accessToken},
+    const accessToken = this.tokenService.getTokenFromHttpRequest(req);
+    if (!accessToken) {
+      throw new UnauthorizedException('No access token');
+    }
+
+    const accessTokenInfo =
+      this.tokenService.verifyUserAccessToken(accessToken);
+    const count = await this.prisma.session.count({
+      where: {accessToken},
     });
 
     if (count > 0) {
-      return true;
+      return {userId: accessTokenInfo.userId};
     } else {
-      return false;
+      throw new UnauthorizedException('Invalid access token');
     }
   }
 }

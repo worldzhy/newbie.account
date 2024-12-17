@@ -10,7 +10,13 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {PermissionAction, Prisma, Role, User, UserStatus} from '@prisma/client';
+import {
+  PermissionAction,
+  Prisma,
+  User,
+  UserRole,
+  UserStatus,
+} from '@prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
 import {verifyUuid} from '@microservices/account/account.validator';
 import {compareHash} from '@framework/utilities/common.util';
@@ -38,7 +44,7 @@ export class UserController {
           phone: '',
           password: '',
           status: UserStatus.ACTIVE,
-          roles: [{id: '013f92b0-4a53-45cb-8eca-e66089a3919f'}],
+          roles: [UserRole.USER],
           profile: {
             create: {
               firstName: '',
@@ -50,27 +56,15 @@ export class UserController {
       },
     },
   })
-  async createUser(
-    @Body()
-    body: Prisma.UserCreateInput & {roles?: Role[]}
-  ) {
-    const {roles, ...user} = body;
-    const userCreateInput: Prisma.UserCreateInput = user;
-    // Construct roles.
-    if (roles && roles.length > 0) {
-      userCreateInput.roles = {
-        connect: roles,
-      };
-    }
-
+  async createUser(@Body() body: Prisma.UserCreateInput) {
     return await this.prisma.user.create({
-      data: userCreateInput,
+      data: body,
       select: {
         id: true,
         email: true,
         phone: true,
         status: true,
-        profile: true,
+        name: true,
       },
     });
   }
@@ -142,10 +136,6 @@ export class UserController {
   async getUser(@Param('userId') userId: string) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: {id: userId},
-      include: {
-        roles: true,
-        profile: true,
-      },
     });
 
     return this.userService.withoutPassword(user);
@@ -162,35 +152,20 @@ export class UserController {
         value: {
           email: '',
           phone: '',
-          profile: {
-            update: {
-              firstName: '',
-              middleName: '',
-              lastName: '',
-            },
-          },
+          firstName: '',
+          middleName: '',
+          lastName: '',
         },
       },
     },
   })
   async updateUser(
     @Param('userId') userId: string,
-    @Body()
-    body: Prisma.UserUpdateInput & {roles?: Role[]}
+    @Body() body: Prisma.UserUpdateInput
   ) {
-    const {roles, ...user} = body;
-    const userUpdateInput: Prisma.UserUpdateInput = user;
-
-    // Construct roles.
-    if (roles && Array.isArray(roles)) {
-      userUpdateInput.roles = {
-        set: roles, // Overwrite the connections with roles.
-      };
-    }
-
     return await this.prisma.user.update({
       where: {id: userId},
-      data: userUpdateInput,
+      data: body,
     });
   }
 
@@ -200,28 +175,6 @@ export class UserController {
     return await this.prisma.user.delete({
       where: {id: userId},
     });
-  }
-
-  @Get(':userId/profiles')
-  @RequirePermission(PermissionAction.Get, Prisma.ModelName.User)
-  async getUserProfiles(@Param('userId') userId: string) {
-    const user = await this.prisma.user.findUniqueOrThrow({
-      where: {id: userId},
-      include: {profile: true},
-    });
-
-    return this.userService.withoutPassword(user);
-  }
-
-  @Get(':userId/roles')
-  @RequirePermission(PermissionAction.Get, Prisma.ModelName.User)
-  async getUserRoles(@Param('userId') userId: string) {
-    const user = await this.prisma.user.findUniqueOrThrow({
-      where: {id: userId},
-      include: {roles: true},
-    });
-
-    return this.userService.withoutPassword(user);
   }
 
   @Patch(':userId/change-password')

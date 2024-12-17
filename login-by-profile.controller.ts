@@ -1,19 +1,15 @@
-import {Controller, Post, Body, Res} from '@nestjs/common';
+import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {Response} from 'express';
 import {AccountService} from './account.service';
 import {GuardByProfile} from './security/passport/profile/profile.decorator';
 import {GuardByUuid} from './security/passport/uuid/uuid.decorator';
-import {AccessToken} from '@prisma/client';
-import {PrismaService} from '@framework/prisma/prisma.service';
+import {UserRequest} from './account.interface';
 
 @ApiTags('Account')
 @Controller('account')
 export class LoginByProfileController {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly accountService: AccountService
-  ) {}
+  constructor(private readonly accountService: AccountService) {}
 
   /**
    * After a user is verified by auth guard, this 'login' function returns
@@ -56,24 +52,22 @@ export class LoginByProfileController {
       suffix?: string;
       dateOfBirth: Date;
     },
+    @Ip() ipAddress: string,
+    @Headers('User-Agent') userAgent: string,
+    @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
-  ): Promise<AccessToken> {
-    // [step 1] It has been confirmed there is only one profile.
-    const {firstName, middleName, lastName, suffix, dateOfBirth} = body;
-    const profiles = await this.prisma.userSingleProfile.findMany({
-      where: {firstName, middleName, lastName, suffix, dateOfBirth},
+  ): Promise<{token: string; tokenExpiresInSeconds: number}> {
+    // [step 1] Login with userId and generate tokens.
+    const {accessToken, cookie} = await this.accountService.login({
+      ipAddress,
+      userAgent,
+      userId: request.user.userId,
     });
 
-    // [step 2] Login with userId and generate tokens.
-    const {accessToken, refreshToken} = await this.accountService.login(
-      profiles[0].userId
-    );
+    // [step 2] Send refresh token to cookie.
+    response.cookie(cookie.name, cookie.value, cookie.options);
 
-    // [step 3] Send refresh token to cookie.
-    const {token, cookie} = refreshToken;
-    response.cookie(cookie.name, token, cookie.options);
-
-    // [step 4] Send access token as response.
+    // [step 3] Send access token as response.
     return accessToken;
   }
 
@@ -93,16 +87,20 @@ export class LoginByProfileController {
   })
   async loginByUuid(
     @Body() body: {uuid: string},
+    @Ip() ipAddress: string,
+    @Headers('User-Agent') userAgent: string,
+    @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
-  ): Promise<AccessToken> {
+  ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with uuid and generate tokens.
-    const {accessToken, refreshToken} = await this.accountService.login(
-      body.uuid
-    );
+    const {accessToken, cookie} = await this.accountService.login({
+      ipAddress,
+      userAgent,
+      userId: request.user.userId,
+    });
 
     // [step 2] Send refresh token to cookie.
-    const {token, cookie} = refreshToken;
-    response.cookie(cookie.name, token, cookie.options);
+    response.cookie(cookie.name, cookie.value, cookie.options);
 
     // [step 3] Send access token as response.
     return accessToken;

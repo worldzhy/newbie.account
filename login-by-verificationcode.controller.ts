@@ -1,19 +1,29 @@
-import {Controller, Post, Body, Res, NotFoundException} from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Res,
+  NotFoundException,
+  Ip,
+  Headers,
+  Req,
+} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {AccessToken, VerificationCodeUse} from '@prisma/client';
+import {VerificationCodeUse} from '@prisma/client';
 import {Response} from 'express';
 import {AccountService} from './account.service';
 import {verifyEmail, verifyPhone} from './account.validator';
 import {NoGuard} from './security/passport/public/public.decorator';
 import {GuardByVerificationCode} from './security/passport/verification-code/verification-code.decorator';
 import {UserService} from './user/user.service';
-import {VerificationCodeService} from './verification-code/verification-code.service';
+import {VerificationCodeService} from './security/verification-code/verification-code.service';
 import {
   NewbieException,
   NewbieExceptionType,
 } from '@framework/exceptions/newbie.exception';
 import {EmailService} from '@microservices/notification/email/email.service';
 import {SmsService} from '@microservices/notification/sms/sms.service';
+import {UserRequest} from './account.interface';
 
 @ApiTags('Account')
 @Controller('account')
@@ -145,17 +155,21 @@ export class LoginByVerificationCodeController {
     },
   })
   async loginByVerificationCode(
+    @Ip() ipAddress: string,
+    @Headers('User-Agent') userAgent: string,
     @Body() body: {account: string; verificationCode: string},
+    @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
-  ): Promise<AccessToken> {
+  ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with verification code and generate tokens.
-    const {accessToken, refreshToken} = await this.accountService.login(
-      body.account
-    );
+    const {accessToken, cookie} = await this.accountService.login({
+      ipAddress,
+      userAgent,
+      userId: request.user.userId,
+    });
 
     // [step 2] Send refresh token to cookie.
-    const {token, cookie} = refreshToken;
-    response.cookie(cookie.name, token, cookie.options);
+    response.cookie(cookie.name, cookie.value, cookie.options);
 
     // [step 3] Send access token as response.
     return accessToken;

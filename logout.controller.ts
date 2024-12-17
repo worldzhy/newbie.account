@@ -1,16 +1,18 @@
 import {Controller, Post, Body, Res} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {Response} from 'express';
-import {RefreshTokenService} from '@microservices/account/security/token/refresh-token.service';
 import {LimitLoginByUserService} from './security/rate-limiter/rate-limiter.service';
-import {TokenService} from './security/token/token.service';
+import {SessionService} from './security/session/session.service';
+import {
+  CookieName,
+  DefaultCookieOptions,
+} from './security/cookie/cookie.constants';
 
 @ApiTags('Account')
 @Controller('account')
 export class LogoutController {
   constructor(
-    private readonly tokenService: TokenService,
-    private readonly refreshTokenService: RefreshTokenService,
+    private readonly sessionService: SessionService,
     private readonly limitLoginByUserService: LimitLoginByUserService
   ) {}
 
@@ -32,16 +34,13 @@ export class LogoutController {
     @Res({passthrough: true}) response: Response
   ): Promise<{data: {message: string}}> {
     // [step 1] Invalidate all tokens.
-    await this.tokenService.invalidateAccessTokenAndRefreshToken(body.userId);
+    await this.sessionService.destroy(body.userId);
 
     // [step 2] Clear user attempts.
     await this.limitLoginByUserService.delete(body.userId);
 
     // [step 3] Clear cookie
-    response.clearCookie(
-      this.refreshTokenService.cookieName,
-      this.refreshTokenService.getCookieOptions()
-    );
+    response.clearCookie(CookieName.REFRESH_TOKEN, DefaultCookieOptions);
 
     // [step 3] Always return success no matter if the user exists.
     return {

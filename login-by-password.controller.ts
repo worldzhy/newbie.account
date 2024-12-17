@@ -1,4 +1,4 @@
-import {Controller, Post, Body, Res} from '@nestjs/common';
+import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {Response} from 'express';
 import {AccountService} from '@microservices/account/account.service';
@@ -7,7 +7,7 @@ import {
   LimitLoginByUser,
 } from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
 import {GuardByPassword} from '@microservices/account/security/passport/password/password.decorator';
-import {AccessToken} from '@prisma/client';
+import {UserRequest} from './account.interface';
 
 @ApiTags('Account')
 @Controller('account')
@@ -43,17 +43,21 @@ export class LoginByPasswordController {
     },
   })
   async loginByPassword(
-    @Body() body: {account: string; password: string},
+    @Body() body: {account: string; password: string}, // Is it required for guard?
+    @Ip() ipAddress: string,
+    @Headers('User-Agent') userAgent: string,
+    @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
-  ): Promise<AccessToken> {
+  ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with password and generate tokens.
-    const {accessToken, refreshToken} = await this.accountService.login(
-      body.account
-    );
+    const {accessToken, cookie} = await this.accountService.login({
+      ipAddress,
+      userAgent,
+      userId: request.user.userId,
+    });
 
     // [step 2] Send refresh token to cookie.
-    const {token, cookie} = refreshToken;
-    response.cookie(cookie.name, token, cookie.options);
+    response.cookie(cookie.name, cookie.value, cookie.options);
 
     // [step 3] Send access token as response.
     return accessToken;
