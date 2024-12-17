@@ -16,7 +16,6 @@ import {CursorPipe} from '@framework/pipes/cursor.pipe';
 import {OptionalIntPipe} from '@framework/pipes/optional-int.pipe';
 import {OrderByPipe} from '@framework/pipes/order-by.pipe';
 import {WherePipe} from '@framework/pipes/where.pipe';
-import {SaasAuthGuard} from '@/microservices/saas/modules/auth/guards/auth.guard';
 import {Expose} from '../account.helper';
 import {AuditLog} from '../audit-logs/audit-log.decorator';
 import {
@@ -34,7 +33,6 @@ export class ApiKeyController {
   /** Create an API key for a team */
   @Post()
   @AuditLog('create-api-key')
-  @UseGuards(SaasAuthGuard)
   async create(
     @Param('userId') userId: string,
     @Body() data: CreateApiKeyDto
