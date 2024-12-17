@@ -34,9 +34,8 @@ export class CreateMembershipDto {
   @IsNotEmpty()
   email!: string;
 
-  @ApiProperty({
-    type: MembershipRole,
-  })
+  @IsString()
+  @IsIn(Object.keys(MembershipRole))
   @IsOptional()
   role?: MembershipRole;
 }
