@@ -1,17 +1,17 @@
 import {Controller, Get, Res} from '@nestjs/common';
 import {ApiTags, ApiCookieAuth} from '@nestjs/swagger';
 import {Response} from 'express';
-import {GuardByRefreshToken} from './security/passport/refresh-token/refresh-token.decorator';
 import {Cookies} from '@framework/decorators/cookie.decorator';
+import {CookieService} from './security/cookie/cookie.service';
 import {SessionService} from './security/session/session.service';
-import {UserRefreshTokenService} from './security/session/refresh-token.service';
 import {TokenService} from './security/token/token.service';
+import {GuardByRefreshToken} from './security/passport/refresh-token/refresh-token.decorator';
 
 @ApiTags('Account')
 @Controller('account')
 export class LoginRefreshController {
   constructor(
-    private readonly userRefreshTokenService: UserRefreshTokenService,
+    private readonly cookieService: CookieService,
     private readonly sessionService: SessionService,
     private readonly tokenService: TokenService
   ) {}
@@ -27,13 +27,11 @@ export class LoginRefreshController {
     const session = await this.sessionService.refresh(refreshToken);
 
     // [step 2] Send refresh token to cookie.
-    const cookie = {
-      name: this.userRefreshTokenService.cookieName,
-      options: this.userRefreshTokenService.getCookieOptions(
-        session.refreshToken
-      ),
-    };
-    response.cookie(cookie.name, session.refreshToken, cookie.options);
+    const cookie = this.cookieService.generateForRefreshToken(
+      session.refreshToken
+    );
+
+    response.cookie(cookie.name, cookie.value, cookie.options);
 
     // [step 3] Send access token as response.
     const accessTokenInfo = this.tokenService.verifyUserAccessToken(
