@@ -10,6 +10,14 @@ import {VerificationCodeModule} from './verification-code/verification-code.modu
 import {RateLimiterGuard} from './rate-limiter/rate-limiter.guard';
 import {PassportGuard} from './passport/passport.guard';
 import {AuthorizationGuard} from './authorization/authorization.guard';
+import {NoAuthGuard} from './passport/public/public.guard';
+import {PasswordAuthGuard} from './passport/password/password.guard';
+import {ApiKeyAuthGuard} from './passport/api-key/api-key.guard';
+import {ProfileAuthGuard} from './passport/profile/profile.guard';
+import {UuidAuthGuard} from './passport/uuid/uuid.guard';
+import {VerificationCodeAuthGuard} from './passport/verification-code/verification-code.guard';
+import {RefreshTokenAuthGuard} from './passport/refresh-token/refresh-token.guard';
+import {JwtAuthGuard} from './passport/jwt/jwt.guard';
 
 import {NoStrategy} from './passport/public/public.strategy';
 import {JwtStrategy} from './passport/jwt/jwt.strategy';
@@ -37,6 +45,14 @@ import {
     {provide: APP_GUARD, useClass: RateLimiterGuard}, // 2nd priority guard.
     {provide: APP_GUARD, useClass: PassportGuard}, // 3rd priority guard.
     {provide: APP_GUARD, useClass: AuthorizationGuard}, // 4th priority guard.
+    NoAuthGuard,
+    PasswordAuthGuard,
+    ApiKeyAuthGuard,
+    ProfileAuthGuard,
+    UuidAuthGuard,
+    VerificationCodeAuthGuard,
+    RefreshTokenAuthGuard,
+    JwtAuthGuard,
 
     NoStrategy,
     JwtStrategy,

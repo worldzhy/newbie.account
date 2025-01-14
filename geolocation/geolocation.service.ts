@@ -14,6 +14,7 @@ export class GeolocationService implements OnModuleDestroy {
       maxSize: this.config.getOrThrow<number>(
         'microservices.account.cache.geolocationLruSize'
       ),
+      sizeCalculation: (value, key) => JSON.stringify(value).length
     });
   }
 
