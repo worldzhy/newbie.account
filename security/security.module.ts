@@ -21,6 +21,7 @@ import {JwtAuthGuard} from './passport/jwt/jwt.guard';
 
 import {NoStrategy} from './passport/public/public.strategy';
 import {JwtStrategy} from './passport/jwt/jwt.strategy';
+import {ApiKeyStrategy} from './passport/api-key/api-key.strategy';
 import {PasswordStrategy} from './passport/password/password.strategy';
 import {ProfileStrategy} from './passport/profile/profile.strategy';
 import {RefreshTokenStrategy} from './passport/refresh-token/refresh-token.strategy';
@@ -56,6 +57,7 @@ import {
 
     NoStrategy,
     JwtStrategy,
+    ApiKeyStrategy,
     PasswordStrategy,
     ProfileStrategy,
     RefreshTokenStrategy,
