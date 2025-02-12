@@ -30,8 +30,8 @@ export class TokenService {
     if (typeof payload === 'number') payload = payload.toString();
     return sign(
       payload,
-      this.config.get<string>('microservices.account.token.secret') ?? '',
-      options
+      this.config.getOrThrow<string>('microservices.account.token.secret'),
+      options as any
     );
   }
 
@@ -106,7 +106,7 @@ export class TokenService {
   signUserAccessToken(payload: {userId: string}) {
     return this.sign(payload, {
       subject: TokenSubject.USER_ACCESS_TOKEN,
-      expiresIn: this.accessTokenExpiresIn,
+      expiresIn: this.accessTokenExpiresIn as any,
     });
   }
 
@@ -122,7 +122,9 @@ export class TokenService {
   ) {
     return this.sign(payload, {
       subject: TokenSubject.USER_REFRESH_TOKEN,
-      expiresIn: options ? options.expiresIn : this.refreshTokenExpiresIn,
+      expiresIn: options
+        ? (options.expiresIn as any)
+        : (this.refreshTokenExpiresIn as any),
     });
   }
 
