@@ -15,6 +15,7 @@ import {AccountService} from '@microservices/account/account.service';
 import {ApprovedSubnetService} from './security/approved-subnet/approved-subnet.service';
 import {TokenService} from './security/token/token.service';
 import {TokenSubject} from './security/token/token.constants';
+import {NoGuard} from './security/passport/public/public.decorator';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {
   NO_TOKEN_PROVIDED,
@@ -23,7 +24,7 @@ import {
 
 @ApiTags('Account')
 @Controller('account')
-export class LoginByPasswordController {
+export class LoginByApproveSubnetController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly accountService: AccountService,
@@ -32,6 +33,7 @@ export class LoginByPasswordController {
   ) {}
 
   @Post('login-by-approve-subnet')
+  @NoGuard()
   async approveSubnet(
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,

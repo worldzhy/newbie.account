@@ -29,6 +29,7 @@ export class ApiKeyService {
       maxSize: this.configService.getOrThrow<number>(
         'microservices.account.cache.apiKeyLruSize'
       ),
+      sizeCalculation: (value, key) => JSON.stringify(value).length
     });
   }
 

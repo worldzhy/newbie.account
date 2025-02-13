@@ -19,7 +19,17 @@ import {ApiKeyAuthGuard} from './api-key/api-key.guard';
 
 @Injectable()
 export class PassportGuard extends AuthGuard('authentication') {
-  constructor(private reflector: Reflector) {
+  constructor(
+    private reflector: Reflector,
+    private noAuthGuard: NoAuthGuard,
+    private passwordAuthGuard: PasswordAuthGuard,
+    private apiKeyAuthGuard: ApiKeyAuthGuard,
+    private profileAuthGuard: ProfileAuthGuard,
+    private uuidAuthGuard: UuidAuthGuard,
+    private verificationCodeAuthGuard: VerificationCodeAuthGuard,
+    private refreshTokenAuthGuard: RefreshTokenAuthGuard,
+    private jwtAuthGuard: JwtAuthGuard
+  ) {
     super();
   }
 
@@ -30,7 +40,7 @@ export class PassportGuard extends AuthGuard('authentication') {
       context.getClass(),
     ]);
     if (isPublic) {
-      return new NoAuthGuard().canActivate(context);
+      return this.noAuthGuard.canActivate(context);
     }
 
     // Use @GuardByPassword() for local.password strategy authentication
@@ -39,7 +49,7 @@ export class PassportGuard extends AuthGuard('authentication') {
       [context.getHandler(), context.getClass()]
     );
     if (isLoggingInByPassword) {
-      return new PasswordAuthGuard().canActivate(context);
+      return this.passwordAuthGuard.canActivate(context);
     }
 
     // Use @GuardByApiKey() for custom.api-key endpoint authentication
@@ -48,7 +58,7 @@ export class PassportGuard extends AuthGuard('authentication') {
       [context.getHandler(), context.getClass()]
     );
     if (isLoggingInByApiKey) {
-      return new ApiKeyAuthGuard().canActivate(context);
+      return this.apiKeyAuthGuard.canActivate(context);
     }
 
     // Use @GuardByProfile() for custom.profile strategy authentication
@@ -57,7 +67,7 @@ export class PassportGuard extends AuthGuard('authentication') {
       [context.getHandler(), context.getClass()]
     );
     if (isLoggingInByProfile) {
-      return new ProfileAuthGuard().canActivate(context);
+      return this.profileAuthGuard.canActivate(context);
     }
 
     // Use @GuardByUuid() for custom.uuid strategy authentication
@@ -66,7 +76,7 @@ export class PassportGuard extends AuthGuard('authentication') {
       [context.getHandler(), context.getClass()]
     );
     if (isLoggingInByUuid) {
-      return new UuidAuthGuard().canActivate(context);
+      return this.uuidAuthGuard.canActivate(context);
     }
 
     // Use @GuardByVerificationCode() for local.verification-code strategy authentication
@@ -76,7 +86,7 @@ export class PassportGuard extends AuthGuard('authentication') {
         [context.getHandler(), context.getClass()]
       );
     if (isLoggingInByVerificationCode) {
-      return new VerificationCodeAuthGuard().canActivate(context);
+      return this.verificationCodeAuthGuard.canActivate(context);
     }
 
     // Use @GuardByRefreshToken() for refresh endpoint authentication
@@ -85,10 +95,10 @@ export class PassportGuard extends AuthGuard('authentication') {
       [context.getHandler(), context.getClass()]
     );
     if (isRefreshingAccessToken) {
-      return new RefreshTokenAuthGuard().canActivate(context);
+      return this.refreshTokenAuthGuard.canActivate(context);
     }
 
     // JWT guard is the default guard.
-    return new JwtAuthGuard().canActivate(context);
+    return this.jwtAuthGuard.canActivate(context);
   }
 }

@@ -23,8 +23,11 @@ export class ApiKeyStrategy extends PassportStrategy(
    */
   async validate(req: Request): Promise<boolean> {
     // [step 1] Guard statement.
-    const keyAndSecret = req.body;
-    const {key, secret}: {key: string; secret: string} = keyAndSecret;
+    // const keyAndSecret = req.body;
+
+    // const {key, secret}: {key: string; secret: string} = keyAndSecret;
+    const key = req.headers['key'] as string;
+    const secret = req.headers['secret'] as string;
     if (!key || !secret) {
       throw new UnauthorizedException(API_KEY_NOT_FOUND);
     }
@@ -38,8 +41,11 @@ export class ApiKeyStrategy extends PassportStrategy(
     }
 
     // [step 3] Validate secret.
-    const match = await compareHash(secret, apiKey.secret);
-    if (match !== true) {
+    // const match = await compareHash(secret, apiKey.secret);
+    // if (match !== true) {
+    //   throw new UnauthorizedException(INVALID_CREDENTIALS);
+    // }
+    if (secret !== apiKey.secret) {
       throw new UnauthorizedException(INVALID_CREDENTIALS);
     }
 

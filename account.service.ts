@@ -95,7 +95,7 @@ export class AccountService {
 
   async login(params: {ipAddress: string; userAgent: string; userId: string}) {
     // [step 0] Check
-    await this.checkEmailOnLogin({userId: params.userId, email: ''});
+    await this.checkEmailOnLogin({userId: params.userId});
 
     await this.checkLocationOnLogin({
       userId: params.userId,
@@ -194,7 +194,7 @@ export class AccountService {
 
     // Create user
     const user = await this.prisma.user.create({
-      data: {...data, emails: {create: {email}}},
+      data: {...data, email, emails: {create: {email}}},
       include: {emails: {select: {id: true}}},
     });
 
@@ -231,14 +231,14 @@ export class AccountService {
     return expose(user);
   }
 
-  private async checkEmailOnLogin(params: {userId: string; email: string}) {
+  private async checkEmailOnLogin(params: {userId: string;}) {
     const user = await this.prisma.user.findUnique({
       where: {id: params.userId},
       select: {email: true, name: true, emails: true},
     });
     if (!user) throw new NotFoundException(USER_NOT_FOUND);
 
-    if (!user.emails.find(i => i.email === params.email)?.isVerified)
+    if (!user.emails.find(i => i.email === user.email)?.isVerified)
       throw new UnauthorizedException(UNVERIFIED_EMAIL);
   }
 

@@ -1,7 +1,6 @@
 import {Controller, Delete, Get, Param, Query} from '@nestjs/common';
 import {ApprovedSubnet, Prisma} from '@prisma/client';
 import {CursorPipe} from '@framework/pipes/cursor.pipe';
-import {OptionalIntPipe} from '@framework/pipes/optional-int.pipe';
 import {OrderByPipe} from '@framework/pipes/order-by.pipe';
 import {WherePipe} from '@framework/pipes/where.pipe';
 import {Expose} from '../../account.helper';
@@ -15,8 +14,8 @@ export class ApprovedSubnetController {
   @Get()
   async getAll(
     @Param('userId') userId: string,
-    @Query('skip', OptionalIntPipe) skip?: number,
-    @Query('take', OptionalIntPipe) take?: number,
+    @Query('skip') skip?: number,
+    @Query('take') take?: number,
     @Query('cursor', CursorPipe) cursor?: Prisma.ApprovedSubnetWhereUniqueInput,
     @Query('where', WherePipe) where?: Record<string, number | string>,
     @Query('orderBy', OrderByPipe) orderBy?: Record<string, 'asc' | 'desc'>
