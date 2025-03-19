@@ -1,4 +1,5 @@
 import {Controller, Delete, Get, Param, Query} from '@nestjs/common';
+import {ApiTags} from '@nestjs/swagger';
 import {ApprovedSubnet, Prisma} from '@prisma/client';
 import {CursorPipe} from '@framework/pipes/cursor.pipe';
 import {OrderByPipe} from '@framework/pipes/order-by.pipe';
@@ -6,6 +7,7 @@ import {WherePipe} from '@framework/pipes/where.pipe';
 import {Expose} from '../../account.helper';
 import {ApprovedSubnetService} from './approved-subnet.service';
 
+@ApiTags('Account / Approved Subnet')
 @Controller('users/:userId/approved-subnets')
 export class ApprovedSubnetController {
   constructor(private approvedSubnetsService: ApprovedSubnetService) {}

@@ -20,7 +20,7 @@ import {
 } from '@framework/exceptions/errors.constants';
 import {UserRequest} from '../../account.interface';
 
-@ApiTags('Users Session')
+@ApiTags('Account / Session')
 @Controller('users/:userId/sessions')
 export class SessionController {
   constructor(private prisma: PrismaService) {}

@@ -26,7 +26,7 @@ import {
 } from './api-key.dto';
 import {ApiKeyService} from './api-key.service';
 
-@ApiTags('Api keys')
+@ApiTags('Account / Api Key')
 @Controller('users/:userId/api-keys')
 export class ApiKeyController {
   constructor(private apiKeyService: ApiKeyService) {}
@@ -45,7 +45,7 @@ export class ApiKeyController {
   @Get()
   @GuardByApiKey()
   async getAll(
-    @Req() request:any,
+    @Req() request: any,
     @Param('userId') userId: string,
     @Query('skip') skip?: number,
     @Query('take') take?: number,
@@ -53,7 +53,6 @@ export class ApiKeyController {
     @Query('where', WherePipe) where?: Record<string, number | string>,
     @Query('orderBy', OrderByPipe) orderBy?: Record<string, 'asc' | 'desc'>
   ): Promise<Expose<ApiKey>[]> {
-
     return this.apiKeyService.getApiKeysForUser(userId, {
       skip,
       take,
@@ -111,7 +110,7 @@ export class ApiKeyController {
     @Param('id') id: number,
     @Query('take') take?: number,
     @Query('cursor', CursorPipe) cursor?: Record<string, number | string>,
-    @Query('where', WherePipe) where?: Record<string, number | string>,
+    @Query('where', WherePipe) where?: Record<string, number | string>
   ): Promise<Record<string, any>[]> {
     return this.apiKeyService.getApiKeyLogs(userId, id, {
       take,
