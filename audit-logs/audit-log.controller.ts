@@ -3,7 +3,7 @@ import {Prisma} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {ApiTags} from '@nestjs/swagger';
 
-@ApiTags('Audit Logs')
+@ApiTags('Account / Audit Log')
 @Controller()
 export class AuditLogController {
   constructor(private prisma: PrismaService) {}
