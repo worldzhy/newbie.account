@@ -9,7 +9,6 @@ import {
   Put,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {ApiKey, Prisma} from '@prisma/client';

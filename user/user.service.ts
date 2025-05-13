@@ -4,7 +4,6 @@ import {PrismaService} from '@framework/prisma/prisma.service';
 import {
   verifyEmail,
   verifyPhone,
-  verifyUuid,
 } from '@microservices/account/account.validator';
 import {userPrismaMiddleware} from './user.prisma.middleware';
 

@@ -46,6 +46,10 @@
       "verificationCode": {
         "timeoutMinutes": 1,
         "resendMinutes": 1
+      },
+      "wechat": {
+        "appId": "process.env.WECHAT_APP_ID || 'your-app-id'",
+        "appSecret": "process.env.WECHAT_APP_SECRET || 'your-app-secret'"
       }
     }
   },

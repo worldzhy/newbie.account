@@ -17,6 +17,7 @@ import {ProfileAuthGuard} from './passport/profile/profile.guard';
 import {UuidAuthGuard} from './passport/uuid/uuid.guard';
 import {VerificationCodeAuthGuard} from './passport/verification-code/verification-code.guard';
 import {RefreshTokenAuthGuard} from './passport/refresh-token/refresh-token.guard';
+import {WechatAuthGuard} from './passport/wechat/wechat.guard';
 import {JwtAuthGuard} from './passport/jwt/jwt.guard';
 
 import {NoStrategy} from './passport/public/public.strategy';
@@ -27,6 +28,7 @@ import {ProfileStrategy} from './passport/profile/profile.strategy';
 import {RefreshTokenStrategy} from './passport/refresh-token/refresh-token.strategy';
 import {UuidStrategy} from './passport/uuid/uuid.strategy';
 import {VerificationCodeStrategy} from './passport/verification-code/verification-code.strategy';
+import {WechatStrategy} from './passport/wechat/wechat.strategy';
 
 import {
   LimitAccessByIpService,
@@ -53,6 +55,7 @@ import {
     UuidAuthGuard,
     VerificationCodeAuthGuard,
     RefreshTokenAuthGuard,
+    WechatAuthGuard,
     JwtAuthGuard,
 
     NoStrategy,
@@ -63,6 +66,7 @@ import {
     RefreshTokenStrategy,
     UuidStrategy,
     VerificationCodeStrategy,
+    WechatStrategy,
 
     LimitAccessByIpService,
     LimitLoginByIpService,

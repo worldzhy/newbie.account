@@ -12,7 +12,6 @@ import {
 } from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {generateRandomString} from '@framework/utilities/random.util';
-import {ElasticsearchService} from '@microservices/elasticsearch/elasticsearch.service';
 import {Expose, expose} from '../account.helper';
 import {LRUCache} from 'lru-cache';
 
@@ -22,14 +21,13 @@ export class ApiKeyService {
 
   constructor(
     private prisma: PrismaService,
-    private configService: ConfigService,
-    private elasticsearch: ElasticsearchService
+    private configService: ConfigService
   ) {
     this.lru = new LRUCache({
       maxSize: this.configService.getOrThrow<number>(
         'microservices.account.cache.apiKeyLruSize'
       ),
-      sizeCalculation: (value, key) => JSON.stringify(value).length
+      sizeCalculation: (value, key) => JSON.stringify(value).length,
     });
   }
 
@@ -222,6 +220,8 @@ export class ApiKeyService {
           'microservices.account.tracking.deleteOldLogsDays'
         )
     );
+
+    /*
     const result = await this.elasticsearch.search({
       index: this.configService.get<string>(
         'microservices.account.tracking.index'
@@ -264,6 +264,7 @@ export class ApiKeyService {
         );
       } catch (error) {}
     }
+    */
 
     return [];
   }
