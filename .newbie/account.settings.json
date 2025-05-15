@@ -63,7 +63,9 @@
     "TRACKING_MODE": "",
     "TRACKING_INDEX": "",
     "TRACKING_DELETE_OLD_LOGS": "",
-    "TRACKING_DELETE_OLD_LOGS_DAYS": ""
+    "TRACKING_DELETE_OLD_LOGS_DAYS": "",
+    "WECHAT_APP_ID": "",
+    "WECHAT_APP_SECRET": ""
   },
   "dependencies": {
     "@aws-sdk/client-pinpoint": "^3.609.0",
