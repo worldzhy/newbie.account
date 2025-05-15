@@ -19,7 +19,7 @@ export class ProfileStrategy extends PassportStrategy(
   async validate(req: Request): Promise<{userId: string}> {
     // [step 1] Guard statement.
     const profile = req.body;
-    const {firstName, middleName, lastName, suffix, dateOfBirth} = profile;
+    const {firstName, middleName, lastName, dateOfBirth} = profile;
     if ((firstName && middleName && lastName && dateOfBirth) === undefined) {
       throw new UnauthorizedException(
         'The firstName, middleName, lastName and dateOfBirth are required.'
@@ -28,7 +28,7 @@ export class ProfileStrategy extends PassportStrategy(
 
     // [step 2] Get profiles.
     const users = await this.prisma.user.findMany({
-      where: {firstName, middleName, lastName, suffix, dateOfBirth},
+      where: {firstName, middleName, lastName, dateOfBirth},
     });
     if (users.length !== 1) {
       throw new UnauthorizedException('There are 0 or multiple users.');

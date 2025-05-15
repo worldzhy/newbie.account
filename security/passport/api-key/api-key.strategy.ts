@@ -7,7 +7,6 @@ import {
   API_KEY_NOT_FOUND,
   INVALID_CREDENTIALS,
 } from '@framework/exceptions/errors.constants';
-import {compareHash} from '@framework/utilities/common.util';
 
 @Injectable()
 export class ApiKeyStrategy extends PassportStrategy(

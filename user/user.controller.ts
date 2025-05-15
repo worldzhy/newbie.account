@@ -18,7 +18,6 @@ import {
   UserStatus,
 } from '@prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
-import {verifyUuid} from '@microservices/account/account.validator';
 import {compareHash} from '@framework/utilities/common.util';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {UserService} from './user.service';
@@ -45,13 +44,9 @@ export class UserController {
           password: '',
           status: UserStatus.ACTIVE,
           roles: [UserRole.USER],
-          profile: {
-            create: {
-              firstName: '',
-              middleName: '',
-              lastName: '',
-            },
-          },
+          firstName: '',
+          middleName: '',
+          lastName: '',
         },
       },
     },
@@ -65,6 +60,9 @@ export class UserController {
         phone: true,
         status: true,
         name: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
       },
     });
   }
@@ -75,31 +73,21 @@ export class UserController {
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
     @Query('name') name?: string,
-    @Query('roleId') roleId?: string
+    @Query('role') role?: UserRole
   ) {
     // [step 1] Construct where argument.
     let where: Prisma.UserWhereInput | undefined;
     const whereConditions: object[] = [];
+
     if (name) {
       name = name.trim();
       if (name.length > 0) {
-        whereConditions.push({
-          profile: {
-            OR: [
-              {firstName: {search: name}},
-              {middleName: {search: name}},
-              {lastName: {search: name}},
-            ],
-          },
-        });
+        whereConditions.push({name: {search: name}});
       }
     }
 
-    if (roleId) {
-      roleId = roleId.trim();
-      if (verifyUuid(roleId)) {
-        whereConditions.push({roles: {some: {id: roleId}}});
-      }
+    if (role) {
+      whereConditions.push({roles: {some: role}});
     }
 
     if (whereConditions.length > 1) {
@@ -114,13 +102,7 @@ export class UserController {
     const result = await this.prisma.findManyInManyPages({
       model: Prisma.ModelName.User,
       pagination: {page, pageSize},
-      findManyArgs: {
-        where: where,
-        include: {
-          roles: true,
-          profile: true,
-        },
-      },
+      findManyArgs: {where: where},
     });
 
     // [step 3] Return users without password.

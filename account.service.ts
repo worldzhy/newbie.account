@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {User, UserGender, UserRole} from '@prisma/client';
+import {Prisma, User, UserGender, UserRole} from '@prisma/client';
 import {Request} from 'express';
 import axios from 'axios';
 import {verifyEmail} from './account.validator';
@@ -68,8 +68,27 @@ export class AccountService {
         phone: true,
         roles: true,
         name: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
         memberships: true,
       },
+    });
+  }
+
+  async updateMe(request: Request, body: Prisma.UserUpdateInput) {
+    // [step 1] Parse token from http request header.
+    const accessToken = this.tokenService.getTokenFromHttpRequest(request);
+
+    // [step 2] Get session record.
+    const session = await this.prisma.session.findFirstOrThrow({
+      where: {accessToken},
+    });
+
+    // [step 3] Get user.
+    return await this.prisma.user.update({
+      where: {id: session.userId},
+      data: body,
     });
   }
 
@@ -231,7 +250,7 @@ export class AccountService {
     return expose(user);
   }
 
-  private async checkEmailOnLogin(params: {userId: string;}) {
+  private async checkEmailOnLogin(params: {userId: string}) {
     const user = await this.prisma.user.findUnique({
       where: {id: params.userId},
       select: {email: true, name: true, emails: true},

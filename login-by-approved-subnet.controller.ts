@@ -24,7 +24,7 @@ import {
 
 @ApiTags('Account')
 @Controller('account')
-export class LoginByApproveSubnetController {
+export class LoginByApprovedSubnetController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly accountService: AccountService,

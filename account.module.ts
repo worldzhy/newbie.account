@@ -3,10 +3,11 @@ import {Global, Module} from '@nestjs/common';
 import {SecurityModule} from './security/security.module';
 
 import {AuditLogController} from './audit-logs/audit-log.controller';
+import {LoginByApprovedSubnetController} from './login-by-approved-subnet.controller';
 import {LoginByPasswordController} from './login-by-password.controller';
 import {LoginByProfileController} from './login-by-profile.controller';
 import {LoginByVerificationCodeController} from './login-by-verificationcode.controller';
-import {LoginByApproveSubnetController} from './login-by-approve-subnet.controller';
+import {LoginByWechatController} from './login-by-wechat.controller';
 import {LoginRefreshController} from './login-refresh.controller';
 import {LogoutController} from './logout.controller';
 import {MeController} from './me.controller';
@@ -31,10 +32,11 @@ import {UserService} from './user/user.service';
   imports: [SecurityModule],
   controllers: [
     AuditLogController,
+    LoginByApprovedSubnetController,
     LoginByPasswordController,
     LoginByProfileController,
     LoginByVerificationCodeController,
-    LoginByApproveSubnetController,
+    LoginByWechatController,
     LoginRefreshController,
     LogoutController,
     MeController,
