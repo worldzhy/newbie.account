@@ -47,6 +47,11 @@
         "timeoutMinutes": 1,
         "resendMinutes": 1
       },
+      "googleAuth": {
+        "clientId": "process.env.GOOGLE_AUTH_CLIENT_ID || 'your-client-id'",
+        "clientSecret": "process.env.GOOGLE_AUTH_CLIENT_SECRET || 'your-client-secret'",
+        "callbackURL": "process.env.GOOGLE_AUTH_CALLBACK_URL || 'your-callback-url'"
+      },
       "wechat": {
         "appId": "process.env.WECHAT_APP_ID || 'your-app-id'",
         "appSecret": "process.env.WECHAT_APP_SECRET || 'your-app-secret'"
@@ -64,6 +69,9 @@
     "TRACKING_INDEX": "",
     "TRACKING_DELETE_OLD_LOGS": "",
     "TRACKING_DELETE_OLD_LOGS_DAYS": "",
+    "GOOGLE_AUTH_CLIENT_ID": "",
+    "GOOGLE_AUTH_CLIENT_SECRET": "",
+    "GOOGLE_AUTH_CALLBACK_URL": "",
     "WECHAT_APP_ID": "",
     "WECHAT_APP_SECRET": ""
   },
@@ -80,6 +88,7 @@
     "maxmind": "latest",
     "passport": "^0.6.0",
     "passport-custom": "^1.1.1",
+    "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "randomcolor": "^0.6.2",
@@ -88,6 +97,7 @@
     "validator": "^13.11.0"
   },
   "devDependencies": {
+    "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^3.0.13",
     "@types/passport-local": "^1.0.38",
     "@types/validator": "^13.11.7"

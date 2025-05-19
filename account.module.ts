@@ -4,6 +4,7 @@ import {SecurityModule} from './security/security.module';
 
 import {AuditLogController} from './audit-logs/audit-log.controller';
 import {LoginByApprovedSubnetController} from './login-by-approved-subnet.controller';
+import {LoginByGoogleController} from './login-by-google.controller';
 import {LoginByPasswordController} from './login-by-password.controller';
 import {LoginByProfileController} from './login-by-profile.controller';
 import {LoginByVerificationCodeController} from './login-by-verificationcode.controller';
@@ -33,6 +34,7 @@ import {UserService} from './user/user.service';
   controllers: [
     AuditLogController,
     LoginByApprovedSubnetController,
+    LoginByGoogleController,
     LoginByPasswordController,
     LoginByProfileController,
     LoginByVerificationCodeController,
