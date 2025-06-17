@@ -1,5 +1,5 @@
 import {Session, User} from '@prisma/client';
-const crypto = require('crypto');
+import {createHash} from 'node:crypto';
 
 /** Delete sensitive keys from an object */
 export function expose<T>(item: T): Expose<T> {
@@ -22,6 +22,6 @@ export type Expose<T> = Omit<
 
 export function getGravatarUrl(email: string, size = 80) {
   const trimmedEmail = email.trim().toLowerCase();
-  const hash = crypto.createHash('sha256').update(trimmedEmail).digest('hex');
+  const hash = createHash('sha256').update(trimmedEmail).digest('hex');
   return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=identicon`;
 }

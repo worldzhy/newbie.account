@@ -79,7 +79,6 @@
     "@aws-sdk/client-pinpoint": "^3.609.0",
     "@nestjs/passport": "^10.0.2",
     "@casl/prisma": "^1.4.1",
-    "crypto": "^1.0.1",
     "geolite2-redist": "latest",
     "ioredis": "^5.3.2",
     "ip-anonymize": "^0.1.0",
