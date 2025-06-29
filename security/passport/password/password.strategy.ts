@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-local';
 import {compareHash} from '@framework/utilities/common.util';
-import {UserService} from '@microservices/account/user/user.service';
+import {UserService} from '@microservices/account/modules/user/user.service';
 import {
   NewbieException,
   NewbieExceptionType,

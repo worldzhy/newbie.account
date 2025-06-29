@@ -3,8 +3,8 @@ import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-custom';
 import {Request} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {SessionService} from '../../session/session.service';
-import {TokenService} from '../../token/token.service';
+import {SessionService} from '@microservices/account/modules/session/session.service';
+import {TokenService} from '@microservices/account/security/token/token.service';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(

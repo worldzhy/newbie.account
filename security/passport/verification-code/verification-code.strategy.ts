@@ -1,12 +1,12 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-local';
-import {VerificationCodeService} from '@microservices/account/security/verification-code/verification-code.service';
-import {UserService} from '@microservices/account/user/user.service';
+import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
+import {UserService} from '@microservices/account/modules/user/user.service';
 import {
   verifyEmail,
   verifyPhone,
-} from '@microservices/account/account.validator';
+} from '@microservices/account/helpers/validator';
 
 @Injectable()
 export class VerificationCodeStrategy extends PassportStrategy(
