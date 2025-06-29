@@ -1,5 +1,6 @@
 import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBody, ApiBearerAuth} from '@nestjs/swagger';
+import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
 import {Response} from 'express';
 import {AccountService} from '@microservices/account/account.service';
 import {GuardByWechat} from '@microservices/account/security/passport/wechat/wechat.decorator';
@@ -10,6 +11,9 @@ export class WechatLoginDto {
    * 微信登录临时凭证
    */
   code: string;
+}
+export class WechatOpenIdLoginDto {
+  openId: string;
 }
 
 @ApiTags('Account')
@@ -55,5 +59,43 @@ export class LoginByWechatController {
 
     // [step 3] 返回访问令牌
     return accessToken;
+  }
+
+  /**
+   * 微信小程序登录
+   *
+   * 使用微信云开发获取用户的openid
+   * 并生成JWT令牌进行身份验证
+   */
+  @NoGuard()
+  @Post('login-by-wechat-openid')
+  @ApiBody({
+    description: '微信登录接口',
+    type: WechatOpenIdLoginDto,
+    examples: {
+      a: {
+        summary: '微信小程序登录',
+        value: {openId: 'xxx'},
+      },
+    },
+  })
+  async loginByWechatOpenId(
+    @Body() body: WechatOpenIdLoginDto,
+    @Ip() ipAddress: string
+  ) {
+    // [step 1] openId获取已有用户
+    const user = await this.accountService.getUserByOpenId({
+      openId: body.openId,
+      ipAddress,
+    });
+    // [step 2] 微信登录并生成令牌
+    const {accessToken} = await this.accountService.login({
+      ipAddress,
+      userAgent: 'wechat-miniprogram',
+      userId: user.id,
+      isSkipCheck: true,
+    });
+    // [step 3] 返回访问令牌和用户信息
+    return {accessToken, user};
   }
 }

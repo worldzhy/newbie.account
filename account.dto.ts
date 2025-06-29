@@ -80,6 +80,15 @@ export class SignUpDto {
   @IsString()
   @IsOptional()
   timezone?: string;
+
+}
+
+export class SignUpWechatDto {
+  @IsString()
+  openId: string;
+
+  @IsString()
+  phone: string;
 }
 
 export class ResendEmailVerificationDto {

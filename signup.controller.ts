@@ -1,8 +1,8 @@
-import {Controller, Post, Body, Ip} from '@nestjs/common';
+import {Controller, Post, Body, Ip, Headers} from '@nestjs/common';
 import {ApiTags, ApiBody} from '@nestjs/swagger';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
 import {AccountService} from './account.service';
-import {SignUpDto} from './account.dto';
+import {SignUpDto, SignUpWechatDto} from './account.dto';
 
 @ApiTags('Account')
 @Controller('account')
@@ -50,6 +50,42 @@ export class SignupController {
   })
   async signup(@Ip() ipAddress: string, @Body() body: SignUpDto) {
     await this.accountService.signup({userData: body, ipAddress});
+  }
+
+
+  @NoGuard()
+  @Post('signup-wechat')
+  @ApiBody({
+    description: 'Wechat phone signup',
+    examples: {
+      a: {
+        summary: 'Sign up with phone',
+        value: {
+          phone: '13960068008',
+          openId: 'xxxx',
+        },
+      },
+    },
+  })
+  async signupWechat(
+    @Ip() ipAddress: string,
+    @Headers('User-Agent') userAgent: string,
+    @Body() body: SignUpWechatDto
+  ) {
+    // [step 1] 微信电话注册用户，或者获取已有用户
+    const user = await this.accountService.signUpOrLoginWechat({
+      userData: body,
+      ipAddress,
+    });
+    // [step 2] 微信登录并生成令牌
+    const {accessToken} = await this.accountService.login({
+      ipAddress,
+      userAgent,
+      userId: user.id,
+      isSkipCheck: true,
+    });
+    // [step 3] 返回访问令牌
+    return {accessToken, user};
   }
 
   /* End */

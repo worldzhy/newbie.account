@@ -10,7 +10,7 @@ import {Prisma, User, UserGender, UserRole} from '@prisma/client';
 import {Request} from 'express';
 import axios from 'axios';
 import {verifyEmail} from './account.validator';
-import {SignUpDto} from './account.dto';
+import {SignUpDto, SignUpWechatDto} from './account.dto';
 import {Expose, expose} from './account.helper';
 import {GeolocationService} from './geolocation/geolocation.service';
 import {ApprovedSubnetService} from './security/approved-subnet/approved-subnet.service';
@@ -112,15 +112,22 @@ export class AccountService {
     return count > 0 ? true : false;
   }
 
-  async login(params: {ipAddress: string; userAgent: string; userId: string}) {
-    // [step 0] Check
-    await this.checkEmailOnLogin({userId: params.userId});
+  async login(params: {
+    ipAddress: string;
+    userAgent: string;
+    userId: string;
+    isSkipCheck?: boolean;
+  }) {
+    // 某些登录方式不需要验证：微信登录
+    if (!params.isSkipCheck) {
+      // [step 0] Check
+      await this.checkEmailOnLogin({userId: params.userId});
 
-    await this.checkLocationOnLogin({
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-    });
-
+      await this.checkLocationOnLogin({
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+      });
+    }
     // [step 1] Disable active session if existed.
     await this.prisma.session.deleteMany({where: {userId: params.userId}});
 
@@ -314,6 +321,41 @@ export class AccountService {
       }
 
       throw new UnauthorizedException(UNVERIFIED_LOCATION);
+    }
+  }
+
+  async signUpOrLoginWechat(params: {
+    ipAddress: string;
+    userData: SignUpWechatDto;
+  }): Promise<Expose<User>> {
+    const {phone, openId} = params.userData;
+
+    const oldUser = await this.prisma.user.findFirst({where: {phone}});
+    if (oldUser) {
+      return expose(oldUser);
+    }
+
+    // Create user
+    const user = await this.prisma.user.create({
+      data: {phone, wechatOpenId: openId, wechatPhone: phone},
+    });
+
+    return expose(user);
+  }
+
+  async getUserByOpenId(params: {
+    ipAddress: string;
+    openId: string;
+  }): Promise<Expose<User>> {
+    const {openId} = params;
+
+    const user = await this.prisma.user.findFirst({
+      where: {wechatOpenId: openId},
+    });
+    if (user) {
+      return expose(user);
+    } else {
+      throw new UnauthorizedException(USER_NOT_FOUND);
     }
   }
 
