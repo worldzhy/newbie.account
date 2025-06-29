@@ -9,22 +9,6 @@ import {ConfigService} from '@nestjs/config';
 import {Prisma, User, UserGender, UserRole} from '@prisma/client';
 import {Request} from 'express';
 import axios from 'axios';
-import {Expose, expose} from './helpers/expose';
-import {verifyEmail} from './helpers/validator';
-import {GeolocationService} from './helpers/geolocation.service';
-import {SignUpDto, SignUpWechatDto} from './account.dto';
-import {ApprovedSubnetService} from './modules/approved-subnet/approved-subnet.service';
-import {SessionService} from './modules/session/session.service';
-import {TokenService} from './security/token/token.service';
-import {TokenSubject} from './security/token/token.constants';
-import {CookieService} from './security/cookie/cookie.service';
-import {CookieName} from './security/cookie/cookie.constants';
-import * as anonymize from 'ip-anonymize';
-import * as randomColor from 'randomcolor';
-import {EmailService} from '@microservices/notification/email/email.service';
-import {PrismaService} from '@framework/prisma/prisma.service';
-import {compareHash} from '@framework/utilities/common.util';
-import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
 import {
   EMAIL_USER_CONFLICT,
   INVALID_EMAIL,
@@ -32,6 +16,22 @@ import {
   UNVERIFIED_LOCATION,
   USER_NOT_FOUND,
 } from '@framework/exceptions/errors.constants';
+import {PrismaService} from '@framework/prisma/prisma.service';
+import {compareHash} from '@framework/utilities/common.util';
+import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
+import {SignUpDto, SignUpWechatDto} from '@microservices/account/account.dto';
+import {Expose, expose} from '@microservices/account/helpers/expose';
+import {verifyEmail} from '@microservices/account/helpers/validator';
+import {GeolocationService} from '@microservices/account/helpers/geolocation.service';
+import {ApprovedSubnetService} from '@microservices/account/modules/approved-subnet/approved-subnet.service';
+import {SessionService} from '@microservices/account/modules/session/session.service';
+import {CookieService} from '@microservices/account/security/cookie/cookie.service';
+import {CookieName} from '@microservices/account/security/cookie/cookie.constants';
+import {TokenService} from '@microservices/account/security/token/token.service';
+import {TokenSubject} from '@microservices/account/security/token/token.constants';
+import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
+import * as anonymize from 'ip-anonymize';
+import * as randomColor from 'randomcolor';
 
 @Injectable()
 export class AccountService {
@@ -45,7 +45,7 @@ export class AccountService {
     private readonly cookieService: CookieService,
     private readonly approvedSubnetService: ApprovedSubnetService,
     private readonly geolocationService: GeolocationService,
-    private readonly email: EmailService
+    private readonly ses: AwsSesService
   ) {
     this.appFrontendUrl = this.config.getOrThrow('framework.app.frontendUrl');
   }
@@ -233,7 +233,7 @@ export class AccountService {
           data: {isVerified: true},
         });
     } else {
-      await this.email.sendWithTemplate({
+      await this.ses.sendEmailWithTemplate({
         toAddress: `"${user.name}" <${email}>`,
         template: {
           'auth/verify-email': {
@@ -302,7 +302,7 @@ export class AccountService {
           .filter(i => i)
           .join(', ') || 'Unknown location';
       if (user.email) {
-        this.email.sendWithTemplate({
+        this.ses.sendEmailWithTemplate({
           toAddress: user.email,
           template: {
             'auth/verify-subnet': {

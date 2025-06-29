@@ -17,14 +17,14 @@ import {
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {AccountService} from '@microservices/account/account.service';
 import {Expose, expose} from '@microservices/account/helpers/expose';
-import {EmailService} from '@microservices/notification/email/email.service';
+import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
 
 @Injectable()
 export class MembershipService {
   constructor(
     private config: ConfigService,
     private prisma: PrismaService,
-    private email: EmailService,
+    private ses: AwsSesService,
     private accountService: AccountService
   ) {}
 
@@ -59,7 +59,7 @@ export class MembershipService {
     });
 
     // Send invitation email
-    this.email.sendWithTemplate({
+    this.ses.sendEmailWithTemplate({
       toAddress: `"${user.name}" <${email}>`,
       template: {
         'organizations/invitation': {

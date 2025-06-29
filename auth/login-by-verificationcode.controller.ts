@@ -25,8 +25,8 @@ import {NoGuard} from '@microservices/account/security/passport/public/public.de
 import {GuardByVerificationCode} from '@microservices/account/security/passport/verification-code/verification-code.decorator';
 import {UserService} from '@microservices/account/modules/user/user.service';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
-import {EmailService} from '@microservices/notification/email/email.service';
-import {SmsService} from '@microservices/notification/sms/sms.service';
+import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
+import {AwsSmsService} from '@microservices/aws-sms/aws-sms.service';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -35,8 +35,8 @@ export class LoginByVerificationCodeController {
     private readonly accountService: AccountService,
     private readonly userService: UserService,
     private readonly verificationCodeService: VerificationCodeService,
-    private readonly emailService: EmailService,
-    private readonly smsService: SmsService
+    private readonly ses: AwsSesService,
+    private readonly sms: AwsSmsService
   ) {}
 
   // *
@@ -88,7 +88,7 @@ export class LoginByVerificationCodeController {
         );
 
       // [step 3] Send verification code.
-      await this.emailService.sendWithTemplate({
+      await this.ses.sendEmailWithTemplate({
         toAddress: body.email,
         template: {
           'auth/verification-code': {
@@ -113,8 +113,8 @@ export class LoginByVerificationCodeController {
         );
 
       // [step 3] Send verification code.
-      await this.smsService.send({
-        phone: body.phone,
+      await this.sms.sendText({
+        phoneNumber: body.phone,
         text: verificationCode.code,
       });
     } else {
