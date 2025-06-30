@@ -9,22 +9,6 @@ import {ConfigService} from '@nestjs/config';
 import {Prisma, User, UserGender, UserRole} from '@prisma/client';
 import {Request} from 'express';
 import axios from 'axios';
-import {verifyEmail} from './account.validator';
-import {SignUpDto} from './account.dto';
-import {Expose, expose} from './account.helper';
-import {GeolocationService} from './geolocation/geolocation.service';
-import {ApprovedSubnetService} from './security/approved-subnet/approved-subnet.service';
-import {SessionService} from './security/session/session.service';
-import {TokenService} from './security/token/token.service';
-import {TokenSubject} from './security/token/token.constants';
-import {CookieService} from './security/cookie/cookie.service';
-import {CookieName} from './security/cookie/cookie.constants';
-import * as anonymize from 'ip-anonymize';
-import * as randomColor from 'randomcolor';
-import {EmailService} from '@microservices/notification/email/email.service';
-import {PrismaService} from '@framework/prisma/prisma.service';
-import {compareHash} from '@framework/utilities/common.util';
-import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
 import {
   EMAIL_USER_CONFLICT,
   INVALID_EMAIL,
@@ -32,6 +16,22 @@ import {
   UNVERIFIED_LOCATION,
   USER_NOT_FOUND,
 } from '@framework/exceptions/errors.constants';
+import {PrismaService} from '@framework/prisma/prisma.service';
+import {compareHash} from '@framework/utilities/common.util';
+import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
+import {SignUpDto, WechatSignupDto} from '@microservices/account/account.dto';
+import {Expose, expose} from '@microservices/account/helpers/expose';
+import {verifyEmail} from '@microservices/account/helpers/validator';
+import {GeolocationService} from '@microservices/account/helpers/geolocation.service';
+import {ApprovedSubnetService} from '@microservices/account/modules/approved-subnet/approved-subnet.service';
+import {SessionService} from '@microservices/account/modules/session/session.service';
+import {CookieService} from '@microservices/account/security/cookie/cookie.service';
+import {CookieName} from '@microservices/account/security/cookie/cookie.constants';
+import {TokenService} from '@microservices/account/security/token/token.service';
+import {TokenSubject} from '@microservices/account/security/token/token.constants';
+import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
+import * as anonymize from 'ip-anonymize';
+import * as randomColor from 'randomcolor';
 
 @Injectable()
 export class AccountService {
@@ -45,7 +45,7 @@ export class AccountService {
     private readonly cookieService: CookieService,
     private readonly approvedSubnetService: ApprovedSubnetService,
     private readonly geolocationService: GeolocationService,
-    private readonly email: EmailService
+    private readonly ses: AwsSesService
   ) {
     this.appFrontendUrl = this.config.getOrThrow('framework.app.frontendUrl');
   }
@@ -112,14 +112,23 @@ export class AccountService {
     return count > 0 ? true : false;
   }
 
-  async login(params: {ipAddress: string; userAgent: string; userId: string}) {
-    // [step 0] Check
-    await this.checkEmailOnLogin({userId: params.userId});
-
-    await this.checkLocationOnLogin({
-      userId: params.userId,
-      ipAddress: params.ipAddress,
-    });
+  async login(params: {
+    ipAddress: string;
+    userAgent: string;
+    userId: string;
+    skipEmailCheck?: boolean;
+    skipLocationCheck?: boolean;
+  }) {
+    // [step 0] Check email and location.
+    if (!params.skipEmailCheck) {
+      await this.checkEmailOnLogin({userId: params.userId});
+    }
+    if (!params.skipLocationCheck) {
+      await this.checkLocationOnLogin({
+        userId: params.userId,
+        ipAddress: params.ipAddress,
+      });
+    }
 
     // [step 1] Disable active session if existed.
     await this.prisma.session.deleteMany({where: {userId: params.userId}});
@@ -226,7 +235,7 @@ export class AccountService {
           data: {isVerified: true},
         });
     } else {
-      await this.email.sendWithTemplate({
+      await this.ses.sendEmailWithTemplate({
         toAddress: `"${user.name}" <${email}>`,
         template: {
           'auth/verify-email': {
@@ -295,7 +304,7 @@ export class AccountService {
           .filter(i => i)
           .join(', ') || 'Unknown location';
       if (user.email) {
-        this.email.sendWithTemplate({
+        this.ses.sendEmailWithTemplate({
           toAddress: user.email,
           template: {
             'auth/verify-subnet': {
@@ -314,6 +323,41 @@ export class AccountService {
       }
 
       throw new UnauthorizedException(UNVERIFIED_LOCATION);
+    }
+  }
+
+  async signUpOrLoginWechat(params: {
+    ipAddress: string;
+    userData: WechatSignupDto;
+  }): Promise<Expose<User>> {
+    const {phone, openId} = params.userData;
+
+    const oldUser = await this.prisma.user.findFirst({where: {phone}});
+    if (oldUser) {
+      return expose(oldUser);
+    }
+
+    // Create user
+    const user = await this.prisma.user.create({
+      data: {phone, wechatOpenId: openId, wechatPhone: phone},
+    });
+
+    return expose(user);
+  }
+
+  async getUserByOpenId(params: {
+    ipAddress: string;
+    openId: string;
+  }): Promise<Expose<User>> {
+    const {openId} = params;
+
+    const user = await this.prisma.user.findFirst({
+      where: {wechatOpenId: openId},
+    });
+    if (user) {
+      return expose(user);
+    } else {
+      throw new UnauthorizedException(USER_NOT_FOUND);
     }
   }
 

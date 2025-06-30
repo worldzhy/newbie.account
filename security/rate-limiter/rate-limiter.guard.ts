@@ -1,6 +1,10 @@
 import {Injectable, ExecutionContext} from '@nestjs/common';
 import {Reflector} from '@nestjs/core';
-import {UserService} from '../../user/user.service';
+import {
+  NewbieException,
+  NewbieExceptionType,
+} from '@framework/exceptions/newbie.exception';
+import {UserService} from '@microservices/account/modules/user/user.service';
 import {
   LimitAccessByIpService,
   LimitLoginByIpService,
@@ -11,10 +15,6 @@ import {
   LIMIT_LOGIN_BY_IP,
   LIMIT_LOGIN_BY_USER,
 } from './rate-limiter.decorator';
-import {
-  NewbieException,
-  NewbieExceptionType,
-} from '@framework/exceptions/newbie.exception';
 
 @Injectable()
 export class RateLimiterGuard {

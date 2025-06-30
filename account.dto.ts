@@ -82,6 +82,14 @@ export class SignUpDto {
   timezone?: string;
 }
 
+export class WechatSignupDto {
+  @IsString()
+  openId: string;
+
+  @IsString()
+  phone: string;
+}
+
 export class ResendEmailVerificationDto {
   @IsEmail()
   @IsNotEmpty()

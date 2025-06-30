@@ -1,11 +1,8 @@
 import {Module} from '@nestjs/common';
 import {APP_GUARD} from '@nestjs/core';
 
-import {ApprovedSubnetModule} from './approved-subnet/approved-subnet.module';
 import {CookieModule} from './cookie/cookie.module';
-import {SessionModule} from './session/session.module';
 import {TokenModule} from './token/token.module';
-import {VerificationCodeModule} from './verification-code/verification-code.module';
 
 import {RateLimiterGuard} from './rate-limiter/rate-limiter.guard';
 import {PassportGuard} from './passport/passport.guard';
@@ -39,13 +36,7 @@ import {
 } from './rate-limiter/rate-limiter.service';
 
 @Module({
-  imports: [
-    ApprovedSubnetModule,
-    CookieModule,
-    SessionModule,
-    TokenModule,
-    VerificationCodeModule,
-  ],
+  imports: [CookieModule, TokenModule],
   providers: [
     {provide: APP_GUARD, useClass: RateLimiterGuard}, // 2nd priority guard.
     {provide: APP_GUARD, useClass: PassportGuard}, // 3rd priority guard.

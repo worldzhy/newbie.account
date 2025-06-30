@@ -1,70 +1,39 @@
 import {Global, Module} from '@nestjs/common';
 
+import {AccountController} from './account.controller';
+import {AccountService} from './account.service';
+import {GeolocationService} from './helpers/geolocation.service';
+import {AuthModule} from './auth/auth.module';
 import {SecurityModule} from './security/security.module';
 
-import {AuditLogController} from './audit-logs/audit-log.controller';
-import {LoginByApprovedSubnetController} from './login-by-approved-subnet.controller';
-import {LoginByGoogleController} from './login-by-google.controller';
-import {LoginByPasswordController} from './login-by-password.controller';
-import {LoginByProfileController} from './login-by-profile.controller';
-import {LoginByVerificationCodeController} from './login-by-verificationcode.controller';
-import {LoginByWechatController} from './login-by-wechat.controller';
-import {LoginRefreshController} from './login-refresh.controller';
-import {LogoutController} from './logout.controller';
-import {MeController} from './me.controller';
-import {MembershipController} from './membership/membership.controller';
-import {PasswordController} from './password.controller';
-import {SignupController} from './signup.controller';
-import {SignupEmailVerifyController} from './signup-email-verify.controller';
-import {ApiKeyController} from './api-key/api-key.controller';
-
-import {OrganizationController} from '../../microservices/account/organization/organization.controller';
-import {PermissionController} from '../../microservices/account/permission/permission.controller';
-import {UserController} from '../../microservices/account/user/user.controller';
-
-import {AccountService} from './account.service';
-import {ApiKeyService} from './api-key/api-key.service';
-import {GeolocationService} from './geolocation/geolocation.service';
-import {MembershipService} from './membership/membership.service';
-import {UserService} from './user/user.service';
+import {ApiKeyModule} from './modules/api-key/api-key.module';
+import {ApprovedSubnetModule} from './modules/approved-subnet/approved-subnet.module';
+import {AuditLogModule} from './modules/audit-logs/audit-log.module';
+import {MembershipModule} from './modules/membership/membership.module';
+import {OrganizationModule} from './modules/organization/organization.module';
+import {PermissionModule} from './modules/permission/permission.module';
+import {SessionModule} from './modules/session/session.module';
+import {UserModule} from './modules/user/user.module';
+import {VerificationCodeModule} from './modules/verification-code/verification-code.module';
 
 @Global()
 @Module({
-  imports: [SecurityModule],
-  controllers: [
-    AuditLogController,
-    LoginByApprovedSubnetController,
-    LoginByGoogleController,
-    LoginByPasswordController,
-    LoginByProfileController,
-    LoginByVerificationCodeController,
-    LoginByWechatController,
-    LoginRefreshController,
-    LogoutController,
-    MeController,
-    MembershipController,
-    PasswordController,
-    SignupController,
-    SignupEmailVerifyController,
-    ApiKeyController,
+  imports: [
+    AuthModule,
+    SecurityModule,
 
-    OrganizationController,
-    PermissionController,
-    UserController,
+    ApiKeyModule,
+    ApprovedSubnetModule,
+    AuditLogModule,
+    MembershipModule,
+    OrganizationModule,
+    PermissionModule,
+    SessionModule,
+    UserModule,
+    VerificationCodeModule,
   ],
-  providers: [
-    AccountService,
-    ApiKeyService,
-    GeolocationService,
-    MembershipService,
-    UserService,
-  ],
-  exports: [
-    AccountService,
-    ApiKeyService,
-    GeolocationService,
-    MembershipService,
-    UserService,
-  ],
+  controllers: [AccountController],
+  providers: [AccountService, GeolocationService],
+  exports: [AccountService, GeolocationService],
 })
 export class AccountModule {}
