@@ -351,6 +351,10 @@ export class AccountService {
   }): Promise<Expose<User>> {
     const {openId} = params;
 
+    if (!openId) {
+      throw new BadRequestException('Wechat OpenId is required');
+    }
+
     const user = await this.prisma.user.findFirst({
       where: {wechatOpenId: openId},
     });

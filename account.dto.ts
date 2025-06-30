@@ -169,3 +169,15 @@ export class VerifyEmailDto {
   @IsOptional()
   origin?: string;
 }
+
+export class WechatLoginDto {
+  /**
+   * 微信登录临时凭证
+   */
+  @IsString()
+  code: string;
+}
+export class WechatOpenIdLoginDto {
+  @IsString()
+  openId: string;
+}

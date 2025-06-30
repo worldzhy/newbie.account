@@ -5,16 +5,10 @@ import {Response} from 'express';
 import {UserRequest} from '@microservices/account/account.interface';
 import {AccountService} from '@microservices/account/account.service';
 import {GuardByWechat} from '@microservices/account/security/passport/wechat/wechat.decorator';
-
-export class WechatLoginDto {
-  /**
-   * 微信登录临时凭证
-   */
-  code: string;
-}
-export class WechatOpenIdLoginDto {
-  openId: string;
-}
+import {
+  WechatLoginDto,
+  WechatOpenIdLoginDto,
+} from '@microservices/account/account.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -48,6 +42,7 @@ export class LoginByWechatController {
       openId: body.openId,
       ipAddress,
     });
+
     // [step 2] 微信登录并生成令牌
     const {accessToken} = await this.accountService.login({
       ipAddress,
@@ -56,6 +51,7 @@ export class LoginByWechatController {
       skipEmailCheck: true,
       skipLocationCheck: true,
     });
+
     // [step 3] 返回访问令牌和用户信息
     return {accessToken, user};
   }
