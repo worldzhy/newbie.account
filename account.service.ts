@@ -19,7 +19,7 @@ import {
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {compareHash} from '@framework/utilities/common.util';
 import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
-import {SignUpDto, SignUpWechatDto} from '@microservices/account/account.dto';
+import {SignUpDto, WechatSignupDto} from '@microservices/account/account.dto';
 import {Expose, expose} from '@microservices/account/helpers/expose';
 import {verifyEmail} from '@microservices/account/helpers/validator';
 import {GeolocationService} from '@microservices/account/helpers/geolocation.service';
@@ -116,18 +116,20 @@ export class AccountService {
     ipAddress: string;
     userAgent: string;
     userId: string;
-    isSkipCheck?: boolean;
+    skipEmailCheck?: boolean;
+    skipLocationCheck?: boolean;
   }) {
-    // 某些登录方式不需要验证：微信登录
-    if (!params.isSkipCheck) {
-      // [step 0] Check
+    // [step 0] Check email and location.
+    if (!params.skipEmailCheck) {
       await this.checkEmailOnLogin({userId: params.userId});
-
+    }
+    if (!params.skipLocationCheck) {
       await this.checkLocationOnLogin({
         userId: params.userId,
         ipAddress: params.ipAddress,
       });
     }
+
     // [step 1] Disable active session if existed.
     await this.prisma.session.deleteMany({where: {userId: params.userId}});
 
@@ -326,7 +328,7 @@ export class AccountService {
 
   async signUpOrLoginWechat(params: {
     ipAddress: string;
-    userData: SignUpWechatDto;
+    userData: WechatSignupDto;
   }): Promise<Expose<User>> {
     const {phone, openId} = params.userData;
 

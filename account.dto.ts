@@ -80,10 +80,9 @@ export class SignUpDto {
   @IsString()
   @IsOptional()
   timezone?: string;
-
 }
 
-export class SignUpWechatDto {
+export class WechatSignupDto {
   @IsString()
   openId: string;
 

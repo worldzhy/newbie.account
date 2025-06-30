@@ -70,10 +70,7 @@ export class WechatStrategy extends PassportStrategy(
         // 如果用户存在，更新session_key
         user = await this.prisma.user.update({
           where: {id: user.id},
-          data: {
-            wechatSessionKey: session_key,
-            lastLoginAt: new Date(),
-          },
+          data: {wechatSessionKey: session_key},
         });
       }
 
