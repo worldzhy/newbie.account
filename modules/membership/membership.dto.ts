@@ -1,26 +1,8 @@
 import {IsEmail, IsIn, IsNotEmpty, IsOptional, IsString} from 'class-validator';
-import {ApiProperty} from '@nestjs/swagger';
-import {Membership, MembershipRole} from '@prisma/client';
-import {
-  CommonPaginationReqDto,
-  CommonPaginationResDto,
-} from '@framework/common.dto';
-import {Expose, expose} from '@microservices/account/helpers/expose';
+import {MembershipRole} from '@prisma/client';
+import {CommonPaginationReqDto} from '@framework/common.dto';
 
-export class ListMembershipsReqDto extends CommonPaginationReqDto {}
-
-export class ListMembershipsResDto {
-  @ApiProperty({
-    type: expose<Membership>,
-    isArray: true,
-  })
-  records: Expose<Membership>[];
-
-  @ApiProperty({
-    type: CommonPaginationResDto,
-  })
-  pagination: CommonPaginationResDto;
-}
+export class ListMembershipsDto extends CommonPaginationReqDto {}
 
 export class UpdateMembershipDto {
   @IsString()
