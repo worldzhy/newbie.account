@@ -17,7 +17,7 @@ import {Expose, expose} from '../../helpers/expose';
 import {AuditLog} from '../audit-logs/audit-log.decorator';
 import {CreateMembershipDto, UpdateMembershipDto} from './membership.dto';
 import {MembershipService} from './membership.service';
-import {MembershipsListReqDto, MembershipsListResDto} from './membership.dto';
+import {ListMembershipsReqDto, ListMembershipsResDto} from './membership.dto';
 
 @ApiTags('Account / Membership')
 @Controller('organizations/:organizationId/memberships')
@@ -41,12 +41,12 @@ export class MembershipController {
   /** Get memberships for a team */
   @Get()
   @ApiResponse({
-    type: MembershipsListResDto,
+    type: ListMembershipsResDto,
   })
   async getAll(
     @Param('organizationId') organizationId: string,
-    @Query() query: MembershipsListReqDto
-  ): Promise<MembershipsListResDto> {
+    @Query() query: ListMembershipsReqDto
+  ): Promise<ListMembershipsResDto> {
     const {page, pageSize} = query;
     const result = await this.prisma.findManyInManyPages({
       model: Prisma.ModelName.Membership,

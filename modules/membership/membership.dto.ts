@@ -7,9 +7,9 @@ import {
 } from '@framework/common.dto';
 import {Expose, expose} from '@microservices/account/helpers/expose';
 
-export class MembershipsListReqDto extends CommonPaginationReqDto {}
+export class ListMembershipsReqDto extends CommonPaginationReqDto {}
 
-export class MembershipsListResDto {
+export class ListMembershipsResDto {
   @ApiProperty({
     type: expose<Membership>,
     isArray: true,
