@@ -26,8 +26,8 @@ export class WechatLoginRefreshController {
 
     return {
       token: session.accessToken,
-      refreshToken: session.refreshToken,
       tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
+      refreshToken: session.refreshToken,
     };
   }
 

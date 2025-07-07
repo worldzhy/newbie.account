@@ -16,7 +16,7 @@ import {
   NewbieExceptionType,
 } from '@framework/exceptions/newbie.exception';
 import {UserRequest} from '@microservices/account/account.interface';
-import {AccountService} from '@microservices/account/account.service';
+import {AuthService} from '@microservices/account/auth/auth.service';
 import {
   verifyEmail,
   verifyPhone,
@@ -32,7 +32,7 @@ import {AwsSmsService} from '@microservices/aws-sms/aws-sms.service';
 @Controller('auth')
 export class LoginByVerificationCodeController {
   constructor(
-    private readonly accountService: AccountService,
+    private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly verificationCodeService: VerificationCodeService,
     private readonly ses: AwsSesService,
@@ -165,7 +165,7 @@ export class LoginByVerificationCodeController {
     @Res({passthrough: true}) response: Response
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with verification code and generate tokens.
-    const {accessToken, cookie} = await this.accountService.login({
+    const {accessToken, cookie} = await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,

@@ -1,7 +1,7 @@
 import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {Response} from 'express';
-import {AccountService} from '@microservices/account/account.service';
+import {AuthService} from '@microservices/account/auth/auth.service';
 import {
   LimitLoginByIp,
   LimitLoginByUser,
@@ -12,7 +12,7 @@ import {UserRequest} from '@microservices/account/account.interface';
 @ApiTags('Account / Auth')
 @Controller('auth')
 export class LoginByPasswordController {
-  constructor(private readonly accountService: AccountService) {}
+  constructor(private readonly authService: AuthService) {}
 
   /**
    * After a user is verified by auth guard, this 'login' function returns
@@ -50,7 +50,7 @@ export class LoginByPasswordController {
     @Res({passthrough: true}) response: Response
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with password and generate tokens.
-    const {accessToken, cookie} = await this.accountService.login({
+    const {accessToken, cookie} = await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,

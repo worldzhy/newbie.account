@@ -2,14 +2,14 @@ import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {Response} from 'express';
 import {UserRequest} from '@microservices/account/account.interface';
-import {AccountService} from '@microservices/account/account.service';
+import {AuthService} from '@microservices/account/auth/auth.service';
 import {GuardByProfile} from '@microservices/account/security/passport/profile/profile.decorator';
 import {GuardByUuid} from '@microservices/account/security/passport/uuid/uuid.decorator';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
 export class LoginByProfileController {
-  constructor(private readonly accountService: AccountService) {}
+  constructor(private readonly authService: AuthService) {}
 
   /**
    * After a user is verified by auth guard, this 'login' function returns
@@ -58,7 +58,7 @@ export class LoginByProfileController {
     @Res({passthrough: true}) response: Response
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with userId and generate tokens.
-    const {accessToken, cookie} = await this.accountService.login({
+    const {accessToken, cookie} = await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,
@@ -93,7 +93,7 @@ export class LoginByProfileController {
     @Res({passthrough: true}) response: Response
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] Login with uuid and generate tokens.
-    const {accessToken, cookie} = await this.accountService.login({
+    const {accessToken, cookie} = await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,

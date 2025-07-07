@@ -15,7 +15,7 @@ import {
   NO_TOKEN_PROVIDED,
   USER_NOT_FOUND,
 } from '@framework/exceptions/errors.constants';
-import {AccountService} from '@microservices/account/account.service';
+import {AuthService} from '@microservices/account/auth/auth.service';
 import {ApprovedSubnetService} from '@microservices/account/modules/approved-subnet/approved-subnet.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {TokenSubject} from '@microservices/account/security/token/token.constants';
@@ -26,7 +26,7 @@ import {NoGuard} from '@microservices/account/security/passport/public/public.de
 export class LoginByApprovedSubnetController {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly accountService: AccountService,
+    private readonly authService: AuthService,
     private readonly approvedSubnetService: ApprovedSubnetService,
     private readonly tokenService: TokenService
   ) {}
@@ -52,7 +52,7 @@ export class LoginByApprovedSubnetController {
     await this.approvedSubnetService.approveNewSubnet(userId, ipAddress);
 
     // [step 3] Log in
-    const {accessToken, cookie} = await this.accountService.login({
+    const {accessToken, cookie} = await this.authService.login({
       ipAddress,
       userAgent,
       userId,

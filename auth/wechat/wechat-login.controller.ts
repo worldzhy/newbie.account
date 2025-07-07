@@ -1,19 +1,18 @@
-import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
+import {Controller, Post, Body, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBody, ApiBearerAuth} from '@nestjs/swagger';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
-import {Response} from 'express';
-import {UserRequest} from '@microservices/account/account.interface';
-import {AccountService} from '@microservices/account/account.service';
-import {GuardByWechat} from '@microservices/account/security/passport/wechat/wechat.decorator';
+import {WechatUserRequest} from '@microservices/account/auth/wechat/wechat-auth.interface';
+import {WechatAuthService} from '@microservices/account/auth/wechat/wechat-auth.service';
+import {GuardByWechatCode} from '@microservices/account/security/passport/wechat/wechat.decorator';
 import {
-  WechatLoginDto,
+  WechatCodeLoginDto,
   WechatOpenIdLoginDto,
-} from '@microservices/account/account.dto';
+} from '@microservices/account/auth/wechat/wechat-auth.dto';
 
 @ApiTags('Account / Auth / Wechat')
 @Controller('auth/wechat')
 export class WechatLoginController {
-  constructor(private readonly accountService: AccountService) {}
+  constructor(private readonly wechatAuthService: WechatAuthService) {}
 
   /**
    * 微信小程序登录
@@ -37,23 +36,11 @@ export class WechatLoginController {
     @Body() body: WechatOpenIdLoginDto,
     @Ip() ipAddress: string
   ) {
-    // [step 1] openId获取已有用户
-    const user = await this.accountService.getUserByOpenId({
-      openId: body.openId,
-      ipAddress,
-    });
-
-    // [step 2] 微信登录并生成令牌
-    const {accessToken} = await this.accountService.login({
+    return await this.wechatAuthService.login({
       ipAddress,
       userAgent: 'wechat-miniprogram',
-      userId: user.id,
-      skipEmailCheck: true,
-      skipLocationCheck: true,
+      openId: body.openId,
     });
-
-    // [step 3] 返回访问令牌和用户信息
-    return {accessToken, user};
   }
 
   /**
@@ -63,11 +50,11 @@ export class WechatLoginController {
    * 并生成JWT令牌进行身份验证
    */
   @Post('login-by-code')
-  @GuardByWechat()
+  @GuardByWechatCode()
   @ApiBearerAuth()
   @ApiBody({
     description: "微信登录接口，请求体必须包含微信临时登录凭证 'code'",
-    type: WechatLoginDto,
+    type: WechatCodeLoginDto,
     examples: {
       a: {
         summary: '微信小程序登录',
@@ -76,23 +63,16 @@ export class WechatLoginController {
     },
   })
   async loginByWechatCode(
-    @Body() body: WechatLoginDto,
+    @Body() body: WechatCodeLoginDto,
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,
-    @Req() request: UserRequest,
-    @Res({passthrough: true}) response: Response
+    @Req() request: WechatUserRequest
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {
     // [step 1] 微信登录并生成令牌
-    const {accessToken, cookie} = await this.accountService.login({
+    return await this.wechatAuthService.login({
       ipAddress,
       userAgent,
-      userId: request.user.userId,
+      openId: request.user.wechatOpenId,
     });
-
-    // [step 2] 发送刷新令牌到cookie
-    response.cookie(cookie.name, cookie.value, cookie.options);
-
-    // [step 3] 返回访问令牌
-    return accessToken;
   }
 }

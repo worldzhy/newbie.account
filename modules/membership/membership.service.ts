@@ -15,7 +15,7 @@ import {
   UNAUTHORIZED_RESOURCE,
 } from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {AccountService} from '@microservices/account/account.service';
+import {AuthService} from '@microservices/account/auth/auth.service';
 import {Expose, expose} from '@microservices/account/helpers/expose';
 import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
 
@@ -25,7 +25,7 @@ export class MembershipService {
     private config: ConfigService,
     private prisma: PrismaService,
     private ses: AwsSesService,
-    private accountService: AccountService
+    private authService: AuthService
   ) {}
 
   async create(params: {
@@ -42,7 +42,7 @@ export class MembershipService {
       where: {emails: {some: {email}}},
     });
     if (!user) {
-      user = await this.accountService.signup({
+      user = await this.authService.signup({
         ipAddress,
         userData: {email},
       });

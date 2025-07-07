@@ -116,7 +116,7 @@ export class PassportGuard extends AuthGuard('authentication') {
       return this.googleAuthGuard.canActivate(context);
     }
 
-    // Use @GuardByWechat() for custom.wechat strategy authentication
+    // Use @GuardByWechatCode() for custom.wechat strategy authentication
     const isLoggingInByWechat = this.reflector.getAllAndOverride<boolean>(
       IS_LOGGING_IN_WECHAT_KEY,
       [context.getHandler(), context.getClass()]

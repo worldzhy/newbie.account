@@ -82,14 +82,6 @@ export class SignUpDto {
   timezone?: string;
 }
 
-export class WechatSignupDto {
-  @IsString()
-  openId: string;
-
-  @IsString()
-  phone: string;
-}
-
 export class ResendEmailVerificationDto {
   @IsEmail()
   @IsNotEmpty()
@@ -168,16 +160,4 @@ export class VerifyEmailDto {
   @IsString()
   @IsOptional()
   origin?: string;
-}
-
-export class WechatLoginDto {
-  /**
-   * 微信登录临时凭证
-   */
-  @IsString()
-  code: string;
-}
-export class WechatOpenIdLoginDto {
-  @IsString()
-  openId: string;
 }
