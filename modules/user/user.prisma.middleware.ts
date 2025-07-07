@@ -10,7 +10,6 @@ export async function userPrismaMiddleware(
   params: Prisma.MiddlewareParams,
   next: (params: Prisma.MiddlewareParams) => Promise<any>
 ) {
-  console.log('[user prisma middleware]');
   if (params.model === Prisma.ModelName.User) {
     switch (params.action) {
       case 'create':

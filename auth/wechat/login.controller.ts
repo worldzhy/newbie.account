@@ -10,9 +10,9 @@ import {
   WechatOpenIdLoginDto,
 } from '@microservices/account/account.dto';
 
-@ApiTags('Account / Auth')
-@Controller('auth')
-export class LoginByWechatController {
+@ApiTags('Account / Auth / Wechat')
+@Controller('auth/wechat')
+export class WechatLoginController {
   constructor(private readonly accountService: AccountService) {}
 
   /**
@@ -22,7 +22,7 @@ export class LoginByWechatController {
    * 并生成JWT令牌进行身份验证
    */
   @NoGuard()
-  @Post('login-by-wechat-openid')
+  @Post('login-by-openid')
   @ApiBody({
     description: '微信登录接口',
     type: WechatOpenIdLoginDto,
@@ -62,7 +62,7 @@ export class LoginByWechatController {
    * 使用微信临时登录凭证code获取用户的openid和unionid，
    * 并生成JWT令牌进行身份验证
    */
-  @Post('login-by-wechat-code')
+  @Post('login-by-code')
   @GuardByWechat()
   @ApiBearerAuth()
   @ApiBody({

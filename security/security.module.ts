@@ -17,6 +17,7 @@ import {RefreshTokenAuthGuard} from './passport/refresh-token/refresh-token.guar
 import {UuidAuthGuard} from './passport/uuid/uuid.guard';
 import {VerificationCodeAuthGuard} from './passport/verification-code/verification-code.guard';
 import {WechatAuthGuard} from './passport/wechat/wechat.guard';
+import {WechatRefreshTokenAuthGuard} from './passport/wechat/wechat-refresh-token.guard';
 
 import {NoStrategy} from './passport/public/public.strategy';
 import {ApiKeyStrategy} from './passport/api-key/api-key.strategy';
@@ -28,6 +29,7 @@ import {RefreshTokenStrategy} from './passport/refresh-token/refresh-token.strat
 import {UuidStrategy} from './passport/uuid/uuid.strategy';
 import {VerificationCodeStrategy} from './passport/verification-code/verification-code.strategy';
 import {WechatStrategy} from './passport/wechat/wechat.strategy';
+import {WechatRefreshTokenStrategy} from './passport/wechat/wechat-refresh-token.strategy';
 
 import {
   LimitAccessByIpService,
@@ -38,9 +40,9 @@ import {
 @Module({
   imports: [CookieModule, TokenModule],
   providers: [
-    {provide: APP_GUARD, useClass: RateLimiterGuard}, // 2nd priority guard.
-    {provide: APP_GUARD, useClass: PassportGuard}, // 3rd priority guard.
-    {provide: APP_GUARD, useClass: AuthorizationGuard}, // 4th priority guard.
+    {provide: APP_GUARD, useClass: RateLimiterGuard}, // 1nd priority guard.
+    {provide: APP_GUARD, useClass: PassportGuard}, // 2rd priority guard.
+    {provide: APP_GUARD, useClass: AuthorizationGuard}, // 3th priority guard.
     NoAuthGuard,
     ApiKeyAuthGuard,
     GoogleAuthGuard,
@@ -51,6 +53,7 @@ import {
     UuidAuthGuard,
     VerificationCodeAuthGuard,
     WechatAuthGuard,
+    WechatRefreshTokenAuthGuard,
 
     NoStrategy,
     ApiKeyStrategy,
@@ -62,6 +65,7 @@ import {
     UuidStrategy,
     VerificationCodeStrategy,
     WechatStrategy,
+    WechatRefreshTokenStrategy,
 
     LimitAccessByIpService,
     LimitLoginByIpService,

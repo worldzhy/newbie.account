@@ -11,15 +11,17 @@ import {UuidAuthGuard} from './uuid/uuid.guard';
 import {VerificationCodeAuthGuard} from './verification-code/verification-code.guard';
 import {GoogleAuthGuard} from './google-oauth/google.guard';
 import {WechatAuthGuard} from './wechat/wechat.guard';
+import {WechatRefreshTokenAuthGuard} from './wechat/wechat-refresh-token.guard';
 import {IS_PUBLIC_KEY} from './public/public.decorator';
 import {IS_LOGGING_IN_PASSWORD_KEY} from './password/password.decorator';
 import {IS_LOGGING_IN_PROFILE_KEY} from './profile/profile.decorator';
 import {IS_LOGGING_IN_UUID_KEY} from './uuid/uuid.decorator';
 import {IS_LOGGING_IN_VERIFICATION_CODE_KEY} from './verification-code/verification-code.decorator';
-import {IS_REFRESHING_ACCESS_TOKEN} from './refresh-token/refresh-token.decorator';
+import {IS_REFRESHING_ACCESS_TOKEN_KEY} from './refresh-token/refresh-token.decorator';
 import {IS_LOGGING_IN_APIKEY_KEY} from './api-key/api-key.decorator';
 import {IS_LOGGING_IN_GOOGLE_KEY} from './google-oauth/google.decorator';
 import {IS_LOGGING_IN_WECHAT_KEY} from './wechat/wechat.decorator';
+import {IS_REFRESHING_WECHAT_ACCESS_TOKEN_KEY} from './wechat/wechat-refresh-token.decorator';
 
 @Injectable()
 export class PassportGuard extends AuthGuard('authentication') {
@@ -34,6 +36,7 @@ export class PassportGuard extends AuthGuard('authentication') {
     private refreshTokenAuthGuard: RefreshTokenAuthGuard,
     private googleAuthGuard: GoogleAuthGuard,
     private wechatAuthGuard: WechatAuthGuard,
+    private wechatRefreshTokenAuthGuard: WechatRefreshTokenAuthGuard,
     private jwtAuthGuard: JwtAuthGuard
   ) {
     super();
@@ -97,7 +100,7 @@ export class PassportGuard extends AuthGuard('authentication') {
 
     // Use @GuardByRefreshToken() for refresh endpoint authentication
     const isRefreshingAccessToken = this.reflector.getAllAndOverride<boolean>(
-      IS_REFRESHING_ACCESS_TOKEN,
+      IS_REFRESHING_ACCESS_TOKEN_KEY,
       [context.getHandler(), context.getClass()]
     );
     if (isRefreshingAccessToken) {
@@ -120,6 +123,16 @@ export class PassportGuard extends AuthGuard('authentication') {
     );
     if (isLoggingInByWechat) {
       return this.wechatAuthGuard.canActivate(context);
+    }
+
+    // Use @GuardByWechatRefreshToken() for custom.wechat-refresh-token strategy authentication
+    const isRefreshingWechatAccessToken =
+      this.reflector.getAllAndOverride<boolean>(
+        IS_REFRESHING_WECHAT_ACCESS_TOKEN_KEY,
+        [context.getHandler(), context.getClass()]
+      );
+    if (isRefreshingWechatAccessToken) {
+      return this.wechatRefreshTokenAuthGuard.canActivate(context);
     }
 
     // JWT guard is the default guard.

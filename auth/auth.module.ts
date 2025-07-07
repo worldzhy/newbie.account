@@ -6,11 +6,13 @@ import {LoginByGoogleController} from './login-by-google.controller';
 import {LoginByPasswordController} from './login-by-password.controller';
 import {LoginByProfileController} from './login-by-profile.controller';
 import {LoginByVerificationCodeController} from './login-by-verificationcode.controller';
-import {LoginByWechatController} from './login-by-wechat.controller';
 import {LoginRefreshController} from './login-refresh.controller';
 import {LogoutController} from './logout.controller';
 import {SignupEmailVerifyController} from './signup-email-verify.controller';
 import {SignupController} from './signup.controller';
+import {WechatLoginController} from './wechat/login.controller';
+import {WechatLoginRefreshController} from './wechat/login-refresh.controller';
+import {WechatSignupController} from './wechat/signup.controller';
 import {SecurityModule} from '../security/security.module';
 
 @Global()
@@ -23,11 +25,13 @@ import {SecurityModule} from '../security/security.module';
     LoginByPasswordController,
     LoginByProfileController,
     LoginByVerificationCodeController,
-    LoginByWechatController,
     LoginRefreshController,
     LogoutController,
     SignupEmailVerifyController,
     SignupController,
+    WechatLoginController,
+    WechatLoginRefreshController,
+    WechatSignupController,
   ],
 })
 export class AuthModule {}
