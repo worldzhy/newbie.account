@@ -65,7 +65,7 @@ export class MembershipService {
         'organizations/invitation': {
           organizationName: membership.organization.name,
           link: `${this.config.get<string>(
-            'microservices.app.frontendUrl'
+            'framework.app.frontendUrl'
           )}/organization/${params.organizationId}`,
         },
       },
