@@ -46,7 +46,7 @@ export class AccountService {
       where: {accessToken},
     });
 
-    // [step 3] Get user.
+    // [step 3] Update user.
     return await this.prisma.user.update({
       where: {id: session.userId},
       data: body,
