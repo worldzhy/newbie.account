@@ -20,8 +20,6 @@ export class TokenService {
 
   /**
    * Sign a JWT
-   * @param payload - Object payload
-   * @param options - Signing options
    */
   sign(
     payload: number | string | object | Buffer,
@@ -37,8 +35,6 @@ export class TokenService {
 
   /**
    * Verify and decode a JWT
-   * @param token - JWT
-   * @param options - Verify options
    */
   verify<T>(token: string, options: {subject: string}) {
     try {
@@ -55,8 +51,6 @@ export class TokenService {
   /**
    * Decode a JWT without verifying it
    * @deprecated Use verify() instead
-   * @param token - JWT
-   * @param options - Decode options
    */
   decode<T>(token: string, options?: DecodeOptions) {
     return decode(token, options) as T;
@@ -103,6 +97,9 @@ export class TokenService {
     return cryptoRandomString({length, characters: charactersOrType});
   }
 
+  /**
+   * Sign user access token
+   */
   signUserAccessToken(payload: {userId: string}) {
     return this.sign(payload, {
       subject: TokenSubject.USER_ACCESS_TOKEN,
@@ -110,12 +107,20 @@ export class TokenService {
     });
   }
 
+  /**
+   * Verify user access token
+   * Returns an object with userId, iat (issued at), and exp (expiration)
+   * If the token is invalid, it throws an UnauthorizedException
+   */
   verifyUserAccessToken(token: string) {
     return this.verify<{userId: string; iat: number; exp: number}>(token, {
       subject: TokenSubject.USER_ACCESS_TOKEN,
     });
   }
 
+  /**
+   * Sign user refresh token
+   */
   signUserRefreshToken(
     payload: {userId: string},
     options?: {expiresIn: string | number}
@@ -128,12 +133,22 @@ export class TokenService {
     });
   }
 
+  /**
+   * Verify user refresh token
+   * Returns an object with userId, iat (issued at), and exp (expiration)
+   * If the token is invalid, it throws an UnauthorizedException
+   */
   verifyUserRefreshToken(token: string) {
     return this.verify<{userId: string; iat: number; exp: number}>(token, {
       subject: TokenSubject.USER_REFRESH_TOKEN,
     });
   }
 
+  /**
+   * Get token from HTTP request
+   * @param request - Express request object
+   * @returns The token if present, otherwise undefined
+   */
   getTokenFromHttpRequest(request: express.Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
