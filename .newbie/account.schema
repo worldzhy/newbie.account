@@ -264,7 +264,7 @@ enum UserStatus {
 }
 
 enum UserRole {
-  SUDO
+  ADMIN
   USER
 
   @@schema("microservice/account")

@@ -53,7 +53,7 @@ export class AccountService {
     });
   }
 
-  async isSudo(request: Request) {
+  async isAdmin(request: Request) {
     // [step 1] Parse token from http request header.
     const accessToken = this.tokenService.getTokenFromHttpRequest(request);
 
@@ -66,7 +66,7 @@ export class AccountService {
     const count = await this.prisma.user.count({
       where: {
         id: session.userId,
-        roles: {has: UserRole.SUDO},
+        roles: {has: UserRole.ADMIN},
       },
     });
 

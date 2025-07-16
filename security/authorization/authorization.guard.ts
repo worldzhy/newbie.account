@@ -1,6 +1,6 @@
 import {Injectable, CanActivate, ExecutionContext} from '@nestjs/common';
 import {Reflector} from '@nestjs/core';
-import {PermissionAction, Prisma} from '@prisma/client';
+import {PermissionAction, Prisma, UserRole} from '@prisma/client';
 import {PERMISSION_KEY} from './authorization.decorator';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '../token/token.service';
@@ -57,8 +57,12 @@ export class AuthorizationGuard implements CanActivate {
     }
 
     // [step 4-2] Get roles' permissions.
-
     if (user.roles.length > 0) {
+      if (user.roles.includes(UserRole.ADMIN)) {
+        // If user is an admin, grant all permissions.
+        return true;
+      }
+
       const rolePermissions = await this.prisma.permission.findMany({
         where: {trustedUserRole: {in: user.roles}},
       });
