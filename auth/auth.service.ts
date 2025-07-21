@@ -18,7 +18,7 @@ import {
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {compareHash} from '@framework/utilities/common.util';
 import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
-import {SignUpDto} from '@microservices/account/account.dto';
+import {SignUpDto} from '@microservices/account/auth/auth.dto';
 import {Expose, expose} from '@microservices/account/helpers/expose';
 import {verifyEmail} from '@microservices/account/helpers/validator';
 import {GeolocationService} from '@microservices/account/helpers/geolocation.service';
@@ -118,20 +118,23 @@ export class AuthService {
     }
 
     // Generate profile picture
-    if (!data.profilePictureUrl) {
-      if (data.name) {
-        let initials = data.name.trim().substring(0, 2).toUpperCase();
-        if (data.name.includes(' '))
-          initials = data.name
-            .split(' ')
-            .map(word => word.trim().substring(0, 1))
-            .join('')
-            .toUpperCase();
-        data.profilePictureUrl = `https://ui-avatars.com/api/?name=${initials}&background=${randomColor(
-          {luminosity: 'light'}
-        ).replace('#', '')}&color=000000`;
-      }
+    let uiAvatarsName: string | undefined = undefined;
+    if (data.name) {
+      uiAvatarsName = data.name;
+    } else if (data.firstName && data.lastName) {
+      uiAvatarsName = `${data.firstName} ${data.lastName}`;
+    } else if (data.firstName) {
+      uiAvatarsName = data.firstName;
+    } else if (data.lastName) {
+      uiAvatarsName = data.lastName;
+    } else if (data.username) {
+      uiAvatarsName = data.username;
+    } else {
+      uiAvatarsName = email.split('@')[0];
     }
+    const uiAvatarsUrl = `https://ui-avatars.com/api/?name=${uiAvatarsName}&background=${randomColor(
+      {luminosity: 'light'}
+    ).replace('#', '')}&color=000000`;
 
     // Generate user gender
     if (!data.gender) {
@@ -159,7 +162,7 @@ export class AuthService {
 
     // Create user
     const user = await this.prisma.user.create({
-      data: {...data, email, emails: {create: {email}}},
+      data: {...data, email, emails: {create: {email}}, uiAvatarsUrl},
       include: {emails: {select: {id: true}}},
     });
 

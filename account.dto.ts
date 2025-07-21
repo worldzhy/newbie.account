@@ -1,86 +1,12 @@
+import {ApiProperty} from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEmail,
-  IsIn,
-  IsLocale,
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
-  Length,
   MinLength,
 } from 'class-validator';
-
-export class SignUpDto {
-  @IsString()
-  @IsOptional()
-  @MinLength(3)
-  name?: string;
-
-  @IsString()
-  @IsOptional()
-  firstName?: string;
-
-  @IsString()
-  @IsOptional()
-  middleName?: string;
-
-  @IsString()
-  @IsOptional()
-  lastName?: string;
-
-  @IsString()
-  @IsOptional()
-  origin?: string;
-
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @IsBoolean()
-  @IsOptional()
-  checkLocationOnLogin?: boolean;
-
-  @IsString()
-  @Length(2, 2)
-  @IsOptional()
-  countryCode?: string;
-
-  @IsString()
-  @IsIn(['MALE', 'FEMALE', 'NONBINARY', 'UNKNOWN'])
-  @IsOptional()
-  gender?: 'MALE' | 'FEMALE' | 'NONBINARY' | 'UNKNOWN';
-
-  @IsIn(['ACCOUNT', 'UPDATES', 'PROMOTIONS'])
-  @IsOptional()
-  notificationEmails?: 'ACCOUNT' | 'UPDATES' | 'PROMOTIONS';
-
-  @IsString()
-  @IsOptional()
-  password?: string | null;
-
-  @IsLocale()
-  @IsOptional()
-  prefersLanguage?: string;
-
-  @IsString()
-  @IsIn(['NO_PREFERENCE', 'LIGHT', 'DARK'])
-  @IsOptional()
-  prefersColorScheme?: 'NO_PREFERENCE' | 'LIGHT' | 'DARK';
-
-  @IsString()
-  @IsIn(['NO_PREFERENCE', 'REDUCE'])
-  @IsOptional()
-  prefersReducedMotion?: 'NO_PREFERENCE' | 'REDUCE';
-
-  @IsUrl()
-  @IsOptional()
-  profilePictureUrl?: string;
-
-  @IsString()
-  @IsOptional()
-  timezone?: string;
-}
 
 export class ResendEmailVerificationDto {
   @IsEmail()
@@ -117,39 +43,33 @@ export class ResetPasswordDto {
   ignorePwnedPassword?: boolean;
 }
 
-export class LoginDto {
-  @IsEmail()
-  @IsNotEmpty()
-  email!: string;
-
-  @IsString()
-  @MinLength(8)
-  @IsOptional()
-  password?: string;
-
-  @IsString()
-  @IsOptional()
-  origin?: string;
-
-  @IsString()
-  @Length(6)
-  @IsOptional()
-  code?: string;
-}
-
-export class TotpLoginDto {
+export class ChangePasswordDto {
+  @ApiProperty({
+    type: String,
+    required: true,
+    description: 'The user ID of the account to change the password for.',
+  })
   @IsString()
   @IsNotEmpty()
-  token!: string;
+  userId!: string;
 
+  @ApiProperty({
+    type: String,
+    required: true,
+    description: 'The current password of the account.',
+  })
   @IsString()
-  @IsOptional()
-  origin?: string;
-
-  @IsString()
-  @Length(6)
   @IsNotEmpty()
-  code!: string;
+  currentPassword!: string;
+
+  @ApiProperty({
+    type: String,
+    required: true,
+    description: 'The new password for the account.',
+  })
+  @IsString()
+  @IsNotEmpty()
+  newPassword!: string;
 }
 
 export class VerifyEmailDto {

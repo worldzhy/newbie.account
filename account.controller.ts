@@ -23,6 +23,7 @@ import {
 } from '@microservices/account/helpers/validator';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
+import {ChangePasswordDto} from '@microservices/account/account.dto';
 
 @ApiTags('Account')
 @Controller('account')
@@ -50,31 +51,7 @@ export class AccountController {
 
   @ApiBearerAuth()
   @Post('change-password')
-  @ApiBody({
-    description:
-      "The 'userId', 'currentPassword' and 'newPassword' are required in request body.",
-    examples: {
-      a: {
-        summary: '1. new password != current password',
-        value: {
-          userId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
-          currentPassword: '',
-          newPassword: '',
-        },
-      },
-      b: {
-        summary: '2. new password == current password',
-        value: {
-          userId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
-          currentPassword: '',
-          newPassword: '',
-        },
-      },
-    },
-  })
-  async changePassword(
-    @Body() body: {userId: string; currentPassword: string; newPassword: string}
-  ) {
+  async changePassword(@Body() body: ChangePasswordDto) {
     // [step 1] Guard statement.
     if (!('currentPassword' in body) || !('newPassword' in body)) {
       throw new BadRequestException(

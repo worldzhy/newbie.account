@@ -1,5 +1,5 @@
 import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
+import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response} from 'express';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {
@@ -8,6 +8,10 @@ import {
 } from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
 import {GuardByPassword} from '@microservices/account/security/passport/password/password.decorator';
 import {UserRequest} from '@microservices/account/account.interface';
+import {
+  LoginByPasswordRequestDto,
+  LoginByPasswordResponseDto,
+} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -28,27 +32,13 @@ export class LoginByPasswordController {
   @LimitLoginByUser()
   @GuardByPassword()
   @ApiBearerAuth()
-  @ApiBody({
-    description:
-      "The request body should contain 'account' and 'password' attributes.",
-    examples: {
-      a: {
-        summary: '1. Log in with email',
-        value: {account: 'admin@newbie.com', password: ''},
-      },
-      b: {
-        summary: '2. Log in with phone',
-        value: {account: '13960068008', password: ''},
-      },
-    },
-  })
   async loginByPassword(
-    @Body() body: {account: string; password: string}, // Is it required for guard?
+    @Body() body: LoginByPasswordRequestDto, // Is it required for guard?
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,
     @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
-  ): Promise<{token: string; tokenExpiresInSeconds: number}> {
+  ): Promise<LoginByPasswordResponseDto> {
     // [step 1] Login with password and generate tokens.
     const {accessToken, cookie} = await this.authService.login({
       ipAddress,
