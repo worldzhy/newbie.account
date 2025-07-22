@@ -9,7 +9,7 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import {ApiTags, ApiResponse} from '@nestjs/swagger';
+import {ApiTags, ApiResponse, ApiBearerAuth} from '@nestjs/swagger';
 import {Prisma, Session} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {Expose, expose} from '../../helpers/expose';
@@ -21,6 +21,7 @@ import {
 import {UserRequest} from '../../account.interface';
 
 @ApiTags('Account / Session')
+@ApiBearerAuth()
 @Controller('users/:userId/sessions')
 export class SessionController {
   constructor(private prisma: PrismaService) {}

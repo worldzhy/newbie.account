@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import {Membership, Prisma} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 import {Expose, expose} from '../../helpers/expose';
 import {AuditLog} from '../audit-logs/audit-log.decorator';
 import {
@@ -23,6 +23,7 @@ import {
 import {MembershipService} from './membership.service';
 
 @ApiTags('Account / Membership')
+@ApiBearerAuth()
 @Controller('organizations/:organizationId/memberships')
 export class MembershipController {
   constructor(

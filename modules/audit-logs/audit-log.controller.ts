@@ -1,9 +1,10 @@
 import {Controller, Get, Query, Param} from '@nestjs/common';
 import {Prisma} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 
 @ApiTags('Account / Audit Log')
+@ApiBearerAuth()
 @Controller()
 export class AuditLogController {
   constructor(private prisma: PrismaService) {}

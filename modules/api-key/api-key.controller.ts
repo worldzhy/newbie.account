@@ -10,7 +10,7 @@ import {
   Query,
   Req,
 } from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 import {ApiKey, Prisma} from '@prisma/client';
 import {CursorPipe} from '@framework/pipes/cursor.pipe';
 import {OrderByPipe} from '@framework/pipes/order-by.pipe';
@@ -26,6 +26,7 @@ import {
 import {ApiKeyService} from './api-key.service';
 
 @ApiTags('Account / Api Key')
+@ApiBearerAuth()
 @Controller('users/:userId/api-keys')
 export class ApiKeyController {
   constructor(private apiKeyService: ApiKeyService) {}
