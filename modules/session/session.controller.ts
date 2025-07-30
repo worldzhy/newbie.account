@@ -13,7 +13,7 @@ import {ApiTags, ApiResponse, ApiBearerAuth} from '@nestjs/swagger';
 import {Prisma, Session} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {Expose, expose} from '../../helpers/expose';
-import {SessionsListResDto, SessionsListReqDto} from './session.dto';
+import {SessionsListResponseDto, SessionsListRequestDto} from './session.dto';
 import {
   SESSION_NOT_FOUND,
   UNAUTHORIZED_RESOURCE,
@@ -28,12 +28,12 @@ export class SessionController {
 
   /** Get sessions for a user */
   @Get()
-  @ApiResponse({type: SessionsListResDto})
+  @ApiResponse({type: SessionsListResponseDto})
   async getAll(
     @Req() req: UserRequest,
     @Param('userId') userId: string,
-    @Query() query: SessionsListReqDto
-  ): Promise<SessionsListResDto> {
+    @Query() query: SessionsListRequestDto
+  ): Promise<SessionsListResponseDto> {
     const {sessionId} = req.user;
     const {page, pageSize} = query;
     const result = await this.prisma.findManyInManyPages({

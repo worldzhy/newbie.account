@@ -12,12 +12,13 @@ import {
 } from '@nestjs/common';
 import {Membership, Prisma} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Expose, expose} from '../../helpers/expose';
 import {AuditLog} from '../audit-logs/audit-log.decorator';
 import {
   CreateMembershipDto,
-  ListMembershipsDto,
+  ListMembershipsRequestDto,
+  ListMembershipsResponseDto,
   UpdateMembershipDto,
 } from './membership.dto';
 import {MembershipService} from './membership.service';
@@ -44,9 +45,13 @@ export class MembershipController {
 
   /** Get memberships for a team */
   @Get()
+  @ApiResponse({
+    type: ListMembershipsResponseDto,
+    description: 'List of memberships for the organization',
+  })
   async getAll(
     @Param('organizationId') organizationId: string,
-    @Query() query: ListMembershipsDto
+    @Query() query: ListMembershipsRequestDto
   ) {
     const {page, pageSize} = query;
     const result = await this.prisma.findManyInManyPages({

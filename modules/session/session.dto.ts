@@ -2,21 +2,16 @@ import {ApiProperty} from '@nestjs/swagger';
 import {Session} from '@prisma/client';
 import {Expose, expose} from '../../helpers/expose';
 import {
-  CommonPaginationReqDto,
-  CommonPaginationResDto,
+  CommonListRequestDto,
+  CommonListResponseDto,
 } from '@framework/common.dto';
 
-export class SessionsListReqDto extends CommonPaginationReqDto {}
+export class SessionsListRequestDto extends CommonListRequestDto {}
 
-export class SessionsListResDto {
+export class SessionsListResponseDto extends CommonListResponseDto {
   @ApiProperty({
     type: expose<Session>,
     isArray: true,
   })
-  records: Expose<Session>[];
-
-  @ApiProperty({
-    type: CommonPaginationResDto,
-  })
-  pagination: CommonPaginationResDto;
+  declare records: Expose<Session>[];
 }

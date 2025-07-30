@@ -7,7 +7,13 @@ import {
   Post,
   Req,
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import {Request} from 'express';
 import {Prisma} from '@prisma/client';
 import {
@@ -23,7 +29,10 @@ import {
 } from '@microservices/account/helpers/validator';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
-import {ChangePasswordDto} from '@microservices/account/account.dto';
+import {
+  ChangePasswordDto,
+  GetCurrentUserResponseDto,
+} from '@microservices/account/account.dto';
 
 @ApiTags('Account')
 @Controller('account')
@@ -36,6 +45,8 @@ export class AccountController {
 
   @Get('me')
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Get current user information'})
+  @ApiResponse({type: GetCurrentUserResponseDto})
   async getCurrentUser(@Req() request: Request) {
     return await this.accountService.me(request);
   }

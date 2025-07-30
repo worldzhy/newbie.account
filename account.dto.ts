@@ -8,6 +8,35 @@ import {
   MinLength,
 } from 'class-validator';
 
+export class GetCurrentUserResponseDto {
+  @ApiProperty({type: String})
+  id: string;
+
+  @ApiProperty({type: String})
+  email: string;
+
+  @ApiProperty({type: String})
+  phone: string;
+
+  @ApiProperty({type: String, isArray: true})
+  roles: string[];
+
+  @ApiProperty({type: String})
+  name: string;
+
+  @ApiProperty({type: String})
+  firstName: string;
+
+  @ApiProperty({type: String})
+  middleName: string;
+
+  @ApiProperty({type: String})
+  lastName: string;
+
+  @ApiProperty({type: Object, isArray: true})
+  memberships: Object[];
+}
+
 export class ResendEmailVerificationDto {
   @IsEmail()
   @IsNotEmpty()
