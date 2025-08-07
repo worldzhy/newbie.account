@@ -1,4 +1,4 @@
-import {WhereInput} from '@casl/prisma/dist/types/prismaClientBoundTypes';
+import {WhereInput} from '@casl/prisma';
 import {SetMetadata} from '@nestjs/common';
 import {PermissionAction, Prisma} from '@prisma/client';
 
