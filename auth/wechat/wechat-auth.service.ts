@@ -56,7 +56,7 @@ export class WechatAuthService {
 
     // Create user
     const user = await this.prisma.user.create({
-      data: {phone, wechatOpenId: openId, wechatPhone: phone},
+      data: {phone, wechatOpenId: openId},
     });
 
     return expose(user);

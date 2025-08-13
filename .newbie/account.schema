@@ -68,13 +68,9 @@ model User {
   sessions             Session[]
 
   // 微信小程序相关字段
-  wechatOpenId      String? @unique // 微信用户唯一标识
-  wechatUnionId     String? // 微信开放平台唯一标识
-  wechatSessionKey  String? // 微信会话密钥
-  wechatPhone       String? // 微信绑定的手机号
-  wechatCountryCode String? // 微信绑定的手机号国家码
-  wechatNickName    String? // 微信用户昵称
-  wechatAvatarUrl   String? // 微信用户头像
+  wechatOpenId     String? @unique // 微信用户唯一标识
+  wechatUnionId    String? // 微信开放平台唯一标识
+  wechatSessionKey String? // 微信会话密钥
 
   @@schema("microservice/account")
 }
