@@ -10,13 +10,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {
-  PermissionAction,
-  Prisma,
-  User,
-  UserRole,
-  UserStatus,
-} from '@prisma/client';
+import {PermissionAction, Prisma, User, UserRole} from '@prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
 import {compareHash} from '@framework/utilities/common.util';
 import {PrismaService} from '@framework/prisma/prisma.service';
@@ -33,24 +27,6 @@ export class UserController {
 
   @Post('')
   @RequirePermission(PermissionAction.Create, Prisma.ModelName.User)
-  @ApiBody({
-    description: '',
-    examples: {
-      a: {
-        summary: '1. Create',
-        value: {
-          email: '',
-          phone: '',
-          password: '',
-          status: UserStatus.ACTIVE,
-          roles: [UserRole.USER],
-          firstName: '',
-          middleName: '',
-          lastName: '',
-        },
-      },
-    },
-  })
   async createUser(@Body() body: Prisma.UserCreateInput) {
     return await this.prisma.user.create({
       data: body,
