@@ -47,9 +47,7 @@ export class ApiKeyService {
         secret,
         ...params.data,
         user: {connect: {id: params.userId}},
-        organization: params.organizationId
-          ? {connect: {id: params.organizationId}}
-          : undefined,
+        organizationId: params.organizationId,
       },
     });
   }
@@ -70,7 +68,7 @@ export class ApiKeyService {
         skip,
         take,
         cursor,
-        where: {...where, organization: {id: organizationId}},
+        where: {...where, organizationId},
         orderBy,
       });
       return apiKey.map(organization => expose<ApiKey>(organization));

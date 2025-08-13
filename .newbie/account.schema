@@ -1,37 +1,19 @@
 // ! ------------------------------------------------------------ //
 // !                [Microservice] Account models                 //
 // ! ------------------------------------------------------------ //
-// * Organization                                                 //
 // * User                                                         //
 // * Email                                                        //
-// * Membership                                                   //
 // * RoutePermission(unused)                                      //
 // * ComponentPermission(unused)                                  //
 // * EndpointPermission(unused)                                   //
 // * Permission                                                   //
 // * VerificationCode                                             //
-// * UserAccessToken                                              //
-// * UserRefreshToken                                             //
+// * Session                                                      //
+// * ApprovedSubnet                                               //
+// * AuditLog                                                     //
+// * ApiKey                                                       //
 // * ApiKeyAccessToken                                            //
 // * ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄ ⌄  //
-
-model Organization {
-  id                String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String
-  autoJoinDomain    Boolean      @default(false)
-  forceTwoFactor    Boolean      @default(false)
-  ipRestrictions    String?
-  onlyAllowDomain   Boolean      @default(false)
-  profilePictureUrl String?
-  attributes        Json?
-  createdAt         DateTime     @default(now())
-  updatedAt         DateTime     @updatedAt
-  apiKeys           ApiKey[]
-  auditLogs         AuditLog[]
-  memberships       Membership[]
-
-  @@schema("microservice/account")
-}
 
 model User {
   // [1] The 'User' and 'VerificationCode' models are both used for logging in.
@@ -64,7 +46,6 @@ model User {
   approvedSubnets      ApprovedSubnet[]
   auditLogs            AuditLog[]
   emails               Email[]
-  memberships          Membership[]
   sessions             Session[]
 
   // 微信小程序相关字段
@@ -84,21 +65,6 @@ model Email {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String   @db.Uuid
 
-  @@index([userId])
-  @@schema("microservice/account")
-}
-
-model Membership {
-  id             Int            @id @default(autoincrement())
-  role           MembershipRole @default(MEMBER)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  organization   Organization   @relation(fields: [organizationId], references: [id])
-  organizationId String         @db.Uuid
-  user           User           @relation(fields: [userId], references: [id])
-  userId         String         @db.Uuid
-
-  @@index([organizationId])
   @@index([userId])
   @@schema("microservice/account")
 }
@@ -134,30 +100,6 @@ model VerificationCode {
   @@schema("microservice/account")
 }
 
-model VerificationCodeEmail {
-  id                Int      @id @default(autoincrement())
-  payload           Json // The notification content for one email address.
-  pinpointRequestId String? // RequestId is the Pinpoint request id. One request can contain multiple text messages.
-  pinpointMessageId String? // MessageId is the email message id.
-  pinpointResponse  Json?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@schema("microservice/account")
-}
-
-model VerificationCodeSms {
-  id                Int      @id @default(autoincrement())
-  payload           Json // The notification content for one phone.
-  pinpointRequestId String? // RequestId is the Pinpoint request id. One request can contain multiple text messages.
-  pinpointMessageId String? // MessageId is the text message id.
-  pinpointResponse  Json?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@schema("microservice/account")
-}
-
 model Session {
   id              Int      @id @default(autoincrement())
   accessToken     String   @unique
@@ -181,15 +123,6 @@ model Session {
   @@schema("microservice/account")
 }
 
-model ApiKeyAccessToken {
-  id        Int      @id @default(autoincrement())
-  apiKey    String
-  token     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@schema("microservice/account")
-}
 
 model ApprovedSubnet {
   id          Int      @id @default(autoincrement())
@@ -223,13 +156,10 @@ model AuditLog {
   updatedAt       DateTime      @updatedAt
   user            User?         @relation(fields: [userId], references: [id])
   userId          String?       @db.Uuid
-  organization    Organization? @relation(fields: [organizationId], references: [id])
-  organizationId  String?       @db.Uuid
-  ApiKey          ApiKey?       @relation(fields: [apiKeyId], references: [id])
+  apiKey          ApiKey?       @relation(fields: [apiKeyId], references: [id])
   apiKeyId        Int?
 
   @@index([userId])
-  @@index([organizationId])
   @@schema("microservice/account")
 }
 
@@ -243,15 +173,24 @@ model ApiKey {
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   auditLogs            AuditLog[]
-  organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  organizationId       String?       @db.Uuid
   user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId               String        @db.Uuid
+  organizationId       String?       @db.Uuid
 
-  @@index([organizationId])
   @@index([userId])
   @@schema("microservice/account")
 }
+
+model ApiKeyAccessToken {
+  id        Int      @id @default(autoincrement())
+  apiKey    String
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@schema("microservice/account")
+}
+
 
 enum UserStatus {
   ACTIVE
@@ -281,14 +220,6 @@ enum MfaMethod {
   SMS
   TOTP
   EMAIL
-
-  @@schema("microservice/account")
-}
-
-enum MembershipRole {
-  OWNER
-  ADMIN
-  MEMBER
 
   @@schema("microservice/account")
 }

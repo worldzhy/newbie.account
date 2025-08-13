@@ -35,13 +35,17 @@ export class AuthorizationGuard implements CanActivate {
     // [step 3] Get user with organization and roles.
     const user = await this.prisma.user.findUniqueOrThrow({
       where: {id: payload.userId},
-      include: {memberships: true},
     });
 
+    // ! Open below code when organization microservice is implemented.
+    /*
     // [step 4-1] Get organization permissions.
-    for (let i = 0; i < user.memberships.length; i++) {
+    const orgMemberships = await this.prisma.orgMembership.findMany({
+      where: {userId: user.id},
+    });
+    for (let i = 0; i < orgMemberships.length; i++) {
       const organizationPermissions = await this.prisma.permission.findMany({
-        where: {trustedMembershipId: user.memberships[i].id},
+        where: {trustedMembershipId: orgMemberships[i].id},
       });
 
       for (let i = 0; i < organizationPermissions.length; i++) {
@@ -55,6 +59,7 @@ export class AuthorizationGuard implements CanActivate {
         }
       }
     }
+    */
 
     // [step 4-2] Get roles' permissions.
     if (user.roles.length > 0) {

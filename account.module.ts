@@ -9,8 +9,6 @@ import {SecurityModule} from './security/security.module';
 import {ApiKeyModule} from './modules/api-key/api-key.module';
 import {ApprovedSubnetModule} from './modules/approved-subnet/approved-subnet.module';
 import {AuditLogModule} from './modules/audit-logs/audit-log.module';
-import {MembershipModule} from './modules/membership/membership.module';
-import {OrganizationModule} from './modules/organization/organization.module';
 import {PermissionModule} from './modules/permission/permission.module';
 import {SessionModule} from './modules/session/session.module';
 import {UserModule} from './modules/user/user.module';
@@ -25,8 +23,6 @@ import {VerificationCodeModule} from './modules/verification-code/verification-c
     ApiKeyModule,
     ApprovedSubnetModule,
     AuditLogModule,
-    MembershipModule,
-    OrganizationModule,
     PermissionModule,
     SessionModule,
     UserModule,
