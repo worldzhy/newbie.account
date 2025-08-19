@@ -42,12 +42,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     const accessTokenInfo =
       this.tokenService.verifyUserAccessToken(accessToken);
-    const count = await this.prisma.session.count({
+
+    const session = await this.prisma.session.findFirst({
       where: {accessToken},
+      select: {user: {select: {id: true, roles: true}}},
     });
 
-    if (count > 0) {
-      return {userId: accessTokenInfo.userId};
+    if (session) {
+      return {id: accessTokenInfo.userId, roles: session.user.roles};
     } else {
       throw new UnauthorizedException('Invalid access token');
     }
