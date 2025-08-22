@@ -49,7 +49,7 @@ export class UserController {
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
     @Query('name') name?: string,
-    @Query('role') role?: UserRole
+    @Query('roles') roles?: UserRole[]
   ) {
     // [step 1] Construct where argument.
     let where: Prisma.UserWhereInput | undefined;
@@ -62,8 +62,8 @@ export class UserController {
       }
     }
 
-    if (role) {
-      whereConditions.push({roles: {some: role}});
+    if (roles) {
+      whereConditions.push({roles: {hasSome: roles}});
     }
 
     if (whereConditions.length > 1) {
