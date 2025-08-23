@@ -30,7 +30,7 @@
           "secret": "process.env.ACCOUNT_USER_ACCESS_TOKEN_SECRET || 'your-user-access-token-secret'"
         },
         "userRefresh": {
-          "expiresIn": "1440m",
+          "expiresIn": "30d",
           "secret": "process.env.ACCOUNT_USER_REFRESH_TOKEN_SECRET || 'your-user-refresh-token-secret'"
         },
         "apiKeyAccess": {

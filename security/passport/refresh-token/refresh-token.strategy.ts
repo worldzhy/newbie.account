@@ -1,10 +1,15 @@
-import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-custom';
 import {Request} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {SessionService} from '@microservices/account/modules/session/session.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
+import {NO_TOKEN_PROVIDED} from '@framework/exceptions/errors.constants';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -23,16 +28,20 @@ export class RefreshTokenStrategy extends PassportStrategy(
    * 'validate' function must be implemented.
    */
   async validate(req: Request): Promise<boolean> {
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken: string = req.cookies.refreshToken;
 
-    // [step 1] Verify that refresh token is in db
-    try {
-      await this.prisma.session.findFirstOrThrow({where: {refreshToken}});
-    } catch (error) {
+    // [step 1] Check if refresh token is provided
+    if (!refreshToken) {
+      throw new UnprocessableEntityException(NO_TOKEN_PROVIDED);
+    }
+
+    // [step 2] Verify that refresh token is in db
+    const count = await this.prisma.session.count({where: {refreshToken}});
+    if (count === 0) {
       throw new UnauthorizedException('Token is incorrect.');
     }
 
-    // [step 2] Validate refresh token.
+    // [step 3] Validate refresh token.
     try {
       this.tokenService.verifyUserRefreshToken(refreshToken);
     } catch (error: unknown) {

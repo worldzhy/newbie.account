@@ -78,9 +78,6 @@ export class SessionService {
   }
 
   async destroy(refreshToken: string) {
-    if (!refreshToken)
-      throw new UnprocessableEntityException(NO_TOKEN_PROVIDED);
-
     const session = await this.prisma.session.findFirst({
       where: {refreshToken},
       select: {id: true, user: {select: {id: true}}},
