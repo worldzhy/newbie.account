@@ -1,5 +1,5 @@
-import {Controller, Post, Body, Res} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
+import {Controller, Post, Res, Req} from '@nestjs/common';
+import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response} from 'express';
 import {SessionService} from '@microservices/account/modules/session/session.service';
 import {
@@ -18,26 +18,15 @@ export class LogoutController {
 
   @Post('logout')
   @ApiBearerAuth()
-  @ApiBody({
-    description: "The request body must contain 'userId' attribute.",
-    examples: {
-      a: {
-        summary: '1. Log out',
-        value: {
-          userId: 'fd5c948e-d15d-48d6-a458-7798e4d9921c',
-        },
-      },
-    },
-  })
   async logout(
-    @Body() body: {userId: string},
+    @Req() req,
     @Res({passthrough: true}) response: Response
   ): Promise<{data: {message: string}}> {
     // [step 1] Invalidate all tokens.
-    await this.sessionService.destroy(body.userId);
+    await this.sessionService.destroy(req.body.id);
 
     // [step 2] Clear user attempts.
-    await this.limitLoginByUserService.delete(body.userId);
+    await this.limitLoginByUserService.delete(req.body.id);
 
     // [step 3] Clear cookie
     response.clearCookie(CookieName.REFRESH_TOKEN, DefaultCookieOptions);
