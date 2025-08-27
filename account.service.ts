@@ -32,6 +32,7 @@ export class AccountService {
         firstName: true,
         middleName: true,
         lastName: true,
+        avatarFileId: true,
       },
     });
   }
