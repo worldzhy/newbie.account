@@ -164,18 +164,12 @@ export class LoginByVerificationCodeController {
     @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {
-    // [step 1] Login with verification code and generate tokens.
-    const {accessToken, cookie} = await this.authService.login({
+    return await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,
+      response,
     });
-
-    // [step 2] Send refresh token to cookie.
-    response.cookie(cookie.name, cookie.value, cookie.options);
-
-    // [step 3] Send access token as response.
-    return accessToken;
   }
 
   /* End */

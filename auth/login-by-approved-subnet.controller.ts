@@ -52,13 +52,12 @@ export class LoginByApprovedSubnetController {
     await this.approvedSubnetService.approveNewSubnet(userId, ipAddress);
 
     // [step 3] Log in
-    const {accessToken, cookie} = await this.authService.login({
+    return await this.authService.login({
       ipAddress,
       userAgent,
       userId,
+      response,
     });
-    response.cookie(cookie.name, cookie.value, cookie.options);
-    return accessToken;
   }
 
   /* End */

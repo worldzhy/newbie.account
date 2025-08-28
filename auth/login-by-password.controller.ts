@@ -2,12 +2,12 @@ import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response} from 'express';
 import {AuthService} from '@microservices/account/auth/auth.service';
+import {GuardByPassword} from '@microservices/account/security/passport/password/password.decorator';
+import {UserRequest} from '@microservices/account/account.interface';
 import {
   LimitLoginByIp,
   LimitLoginByUser,
 } from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
-import {GuardByPassword} from '@microservices/account/security/passport/password/password.decorator';
-import {UserRequest} from '@microservices/account/account.interface';
 import {
   LoginByPasswordRequestDto,
   LoginByPasswordResponseDto,
@@ -39,18 +39,12 @@ export class LoginByPasswordController {
     @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
   ): Promise<LoginByPasswordResponseDto> {
-    // [step 1] Login with password and generate tokens.
-    const {accessToken, cookie} = await this.authService.login({
+    return await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,
+      response,
     });
-
-    // [step 2] Send refresh token to cookie.
-    response.cookie(cookie.name, cookie.value, cookie.options);
-
-    // [step 3] Send access token as response.
-    return accessToken;
   }
 
   /* End */

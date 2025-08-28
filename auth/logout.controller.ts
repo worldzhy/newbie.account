@@ -4,8 +4,8 @@ import {Response} from 'express';
 import {SessionService} from '@microservices/account/modules/session/session.service';
 import {
   CookieName,
-  DefaultCookieOptions,
-} from '@microservices/account/security/cookie/cookie.constants';
+  CookieService,
+} from '@microservices/account/security/cookie/cookie.service';
 import {LimitLoginByUserService} from '@microservices/account/security/rate-limiter/rate-limiter.service';
 
 @ApiTags('Account / Auth')
@@ -13,6 +13,7 @@ import {LimitLoginByUserService} from '@microservices/account/security/rate-limi
 export class LogoutController {
   constructor(
     private readonly sessionService: SessionService,
+    private readonly cookieService: CookieService,
     private readonly limitLoginByUserService: LimitLoginByUserService
   ) {}
 
@@ -29,7 +30,7 @@ export class LogoutController {
     await this.limitLoginByUserService.delete(req.body.id);
 
     // [step 3] Clear cookie
-    response.clearCookie(CookieName.REFRESH_TOKEN, DefaultCookieOptions);
+    this.cookieService.clear(response, CookieName.REFRESH_TOKEN);
 
     // [step 3] Always return success no matter if the user exists.
     return {

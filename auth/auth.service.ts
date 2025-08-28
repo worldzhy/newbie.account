@@ -8,6 +8,7 @@ import {
 import {ConfigService} from '@nestjs/config';
 import {User, UserGender} from '@prisma/client';
 import axios from 'axios';
+import {Response} from 'express';
 import {
   EMAIL_USER_CONFLICT,
   INVALID_EMAIL,
@@ -17,7 +18,6 @@ import {
 } from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {compareHash} from '@framework/utilities/common.util';
-import {dateOfUnixTimestamp} from '@framework/utilities/datetime.util';
 import {SignUpDto} from '@microservices/account/auth/auth.dto';
 import {Expose, expose} from '@microservices/account/helpers/expose';
 import {verifyEmail} from '@microservices/account/helpers/validator';
@@ -25,7 +25,6 @@ import {GeolocationService} from '@microservices/account/helpers/geolocation.ser
 import {ApprovedSubnetService} from '@microservices/account/modules/approved-subnet/approved-subnet.service';
 import {SessionService} from '@microservices/account/modules/session/session.service';
 import {CookieService} from '@microservices/account/security/cookie/cookie.service';
-import {CookieName} from '@microservices/account/security/cookie/cookie.constants';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {TokenSubject} from '@microservices/account/security/token/token.constants';
 import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
@@ -55,6 +54,7 @@ export class AuthService {
     userId: string;
     skipEmailCheck?: boolean;
     skipLocationCheck?: boolean;
+    response: Response;
   }) {
     // [step 0] Check email and location.
     if (!params.skipEmailCheck) {
@@ -83,23 +83,19 @@ export class AuthService {
       userId: params.userId,
     });
 
+    // [step 4] Set refresh token in cookie.
+    this.cookieService.set(
+      params.response,
+      this.cookieService.generateForRefreshToken(session.refreshToken)
+    );
+
+    // [step 5] Return access token.
     const accessTokenInfo = this.tokenService.verifyUserAccessToken(
       session.accessToken
     );
-    const refreshTokenInfo = this.tokenService.verifyUserRefreshToken(
-      session.refreshToken
-    );
-
     return {
-      accessToken: {
-        token: session.accessToken,
-        tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
-      },
-      cookie: this.cookieService.generate({
-        name: CookieName.REFRESH_TOKEN,
-        value: session.refreshToken,
-        options: {expires: dateOfUnixTimestamp(refreshTokenInfo.exp)},
-      }),
+      token: session.accessToken,
+      tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
     };
   }
 
@@ -197,6 +193,26 @@ export class AuthService {
       params.ipAddress
     );
     return expose(user);
+  }
+
+  async refreshAccessToken(params: {refreshToken: string; response: Response}) {
+    // [step 1]  Refresh
+    const session = await this.sessionService.refresh(params.refreshToken);
+
+    // [step 2] Set refresh token in cookie.
+    this.cookieService.set(
+      params.response,
+      this.cookieService.generateForRefreshToken(session.refreshToken)
+    );
+
+    // [step 3] Return access token.
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(
+      session.accessToken
+    );
+    return {
+      token: session.accessToken,
+      tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
+    };
   }
 
   private async checkEmailOnLogin(params: {userId: string}) {

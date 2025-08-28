@@ -7,9 +7,10 @@ import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-custom';
 import {Request} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
+import {NO_TOKEN_PROVIDED} from '@framework/exceptions/errors.constants';
 import {SessionService} from '@microservices/account/modules/session/session.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
-import {NO_TOKEN_PROVIDED} from '@framework/exceptions/errors.constants';
+import {CookieName} from '@microservices/account/security/cookie/cookie.service';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -28,7 +29,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
    * 'validate' function must be implemented.
    */
   async validate(req: Request): Promise<boolean> {
-    const refreshToken: string = req.cookies.refreshToken;
+    const refreshToken: string = req.cookies[CookieName.REFRESH_TOKEN];
 
     // [step 1] Check if refresh token is provided
     if (!refreshToken) {
