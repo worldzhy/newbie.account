@@ -41,7 +41,7 @@ export class ApiKeyService {
   }): Promise<ApiKey> {
     const key = await generateRandomString();
     const secret = await generateRandomString();
-    return this.prisma.apiKey.create({
+    return await this.prisma.apiKey.create({
       data: {
         key,
         secret,
