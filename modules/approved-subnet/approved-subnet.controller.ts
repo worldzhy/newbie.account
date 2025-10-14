@@ -22,7 +22,7 @@ export class ApprovedSubnetController {
     @Query('where', WherePipe) where?: Record<string, number | string>,
     @Query('orderBy', OrderByPipe) orderBy?: Record<string, 'asc' | 'desc'>
   ): Promise<Expose<ApprovedSubnet>[]> {
-    return this.approvedSubnetsService.getApprovedSubnets(userId, {
+    return await this.approvedSubnetsService.getApprovedSubnets(userId, {
       skip,
       take,
       orderBy,
@@ -37,7 +37,7 @@ export class ApprovedSubnetController {
     @Param('userId') userId: string,
     @Param('id') id: number
   ): Promise<Expose<ApprovedSubnet>> {
-    return this.approvedSubnetsService.getApprovedSubnet(userId, id);
+    return await this.approvedSubnetsService.getApprovedSubnet(userId, id);
   }
 
   /** Delete an approved subnet for a user */
@@ -46,6 +46,6 @@ export class ApprovedSubnetController {
     @Param('userId') userId: string,
     @Param('id') id: number
   ): Promise<Expose<ApprovedSubnet>> {
-    return this.approvedSubnetsService.deleteApprovedSubnet(userId, id);
+    return await this.approvedSubnetsService.deleteApprovedSubnet(userId, id);
   }
 }

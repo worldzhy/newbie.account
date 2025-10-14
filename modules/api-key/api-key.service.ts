@@ -183,7 +183,7 @@ export class ApiKeyService {
     if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
     if (testApiKey.organizationId !== organizationId)
       throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
-    return this.getApiLogsFromKey(testApiKey.key, params);
+    return await this.getApiLogsFromKey(testApiKey.key, params);
   }
   async getApiKeyLogs(
     userId: string,
@@ -200,7 +200,7 @@ export class ApiKeyService {
     if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
     if (testApiKey.userId !== userId)
       throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
-    return this.getApiLogsFromKey(testApiKey.key, params);
+    return await this.getApiLogsFromKey(testApiKey.key, params);
   }
 
   private async getApiLogsFromKey(

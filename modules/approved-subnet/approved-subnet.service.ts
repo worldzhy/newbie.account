@@ -110,6 +110,6 @@ export class ApprovedSubnetService {
       if (await compareHash(subnet, item.subnet))
         return expose<ApprovedSubnet>(item);
     }
-    return this.approveNewSubnet(userId, ipAddress);
+    return await this.approveNewSubnet(userId, ipAddress);
   }
 }

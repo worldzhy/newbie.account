@@ -38,7 +38,7 @@ export class ApiKeyController {
     @Param('userId') userId: string,
     @Body() data: CreateApiKeyDto
   ): Promise<Expose<ApiKey>> {
-    return this.apiKeyService.createApiKey({userId, data});
+    return await this.apiKeyService.createApiKey({userId, data});
   }
 
   /** Get API keys for a user */
@@ -53,7 +53,7 @@ export class ApiKeyController {
     @Query('where', WherePipe) where?: Record<string, number | string>,
     @Query('orderBy', OrderByPipe) orderBy?: Record<string, 'asc' | 'desc'>
   ): Promise<Expose<ApiKey>[]> {
-    return this.apiKeyService.getApiKeysForUser(userId, {
+    return await this.apiKeyService.getApiKeysForUser(userId, {
       skip,
       take,
       orderBy,
@@ -68,7 +68,7 @@ export class ApiKeyController {
     @Param('userId') userId: string,
     @Param('id') id: number
   ): Promise<Expose<ApiKey>> {
-    return this.apiKeyService.getApiKeyForUser(userId, id);
+    return await this.apiKeyService.getApiKeyForUser(userId, id);
   }
 
   /** Update an API key */
@@ -79,7 +79,7 @@ export class ApiKeyController {
     @Param('userId') userId: string,
     @Param('id') id: number
   ): Promise<Expose<ApiKey>> {
-    return this.apiKeyService.updateApiKey(userId, id, data);
+    return await this.apiKeyService.updateApiKey(userId, id, data);
   }
 
   /** Replace an API key */
@@ -90,7 +90,7 @@ export class ApiKeyController {
     @Param('userId') userId: string,
     @Param('id') id: number
   ): Promise<Expose<ApiKey>> {
-    return this.apiKeyService.updateApiKey(userId, id, data);
+    return await this.apiKeyService.updateApiKey(userId, id, data);
   }
 
   /** Delete an API key */
@@ -100,7 +100,7 @@ export class ApiKeyController {
     @Param('userId') userId: string,
     @Param('id') id: number
   ): Promise<Expose<ApiKey>> {
-    return this.apiKeyService.deleteApiKey(userId, id);
+    return await this.apiKeyService.deleteApiKey(userId, id);
   }
 
   /** Get logs for an API key */
@@ -112,7 +112,7 @@ export class ApiKeyController {
     @Query('cursor', CursorPipe) cursor?: Record<string, number | string>,
     @Query('where', WherePipe) where?: Record<string, number | string>
   ): Promise<Record<string, any>[]> {
-    return this.apiKeyService.getApiKeyLogs(userId, id, {
+    return await this.apiKeyService.getApiKeyLogs(userId, id, {
       take,
       cursor,
       where,
