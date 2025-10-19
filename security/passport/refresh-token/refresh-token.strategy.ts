@@ -29,7 +29,10 @@ export class RefreshTokenStrategy extends PassportStrategy(
    * 'validate' function must be implemented.
    */
   async validate(req: Request): Promise<boolean> {
-    const refreshToken: string = req.cookies[CookieName.REFRESH_TOKEN];
+    // [step 0] Extract refresh token from cookie or body
+    const refreshToken: string =
+      req.cookies[CookieName.REFRESH_TOKEN] ||
+      req.body[CookieName.REFRESH_TOKEN];
 
     // [step 1] Check if refresh token is provided
     if (!refreshToken) {
