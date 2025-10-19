@@ -1,9 +1,12 @@
+import {ApiProperty} from '@nestjs/swagger';
 import {IsString} from 'class-validator';
 
-export class WechatSignupDto {
+export class WechatLoginDto {
+  @ApiProperty({type: String, required: true})
   @IsString()
   openId: string;
 
+  @ApiProperty({type: String, required: true})
   @IsString()
   phone: string;
 }
@@ -14,8 +17,4 @@ export class WechatCodeLoginDto {
    */
   @IsString()
   code: string;
-}
-export class WechatOpenIdLoginDto {
-  @IsString()
-  openId: string;
 }
