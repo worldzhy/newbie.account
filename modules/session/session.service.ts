@@ -1,15 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {GeolocationService} from '@microservices/account/helpers/geolocation.service';
 import {UAParser} from 'ua-parser-js';
-import {
-  NO_TOKEN_PROVIDED,
-  SESSION_NOT_FOUND,
-} from '@framework/exceptions/errors.constants';
+import {SESSION_NOT_FOUND} from '@framework/exceptions/errors.constants';
 import {secondsUntilUnixTimestamp} from '@framework/utilities/datetime.util';
 import {TokenService} from '../../security/token/token.service';
 
