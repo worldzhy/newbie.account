@@ -24,17 +24,17 @@
         }
       },
       "token": {
-        "secret": "process.env.ACCOUNT_TOKEN_SECRET || 'your-token-secret'",
+        "defaultSecret": "process.env.ACCOUNT_DEFAULT_TOKEN_SECRET || 'your-default-token-secret'",
         "userAccess": {
           "expiresIn": "10m",
-          "secret": "process.env.ACCOUNT_USER_ACCESS_TOKEN_SECRET || 'your-user-access-token-secret'"
+          "secret": "process.env.ACCOUNT_USER_ACCESS_TOKEN_SECRET"
         },
         "userRefresh": {
           "expiresIn": "30d",
-          "secret": "process.env.ACCOUNT_USER_REFRESH_TOKEN_SECRET || 'your-user-refresh-token-secret'"
+          "secret": "process.env.ACCOUNT_USER_REFRESH_TOKEN_SECRET"
         },
         "apiKeyAccess": {
-          "secret": "process.env.ACCOUNT_APIKEY_ACCESS_TOKEN_SECRET || 'your-apikey-access-token-secret'"
+          "secret": "process.env.ACCOUNT_APIKEY_ACCESS_TOKEN_SECRET"
         }
       },
       "tracking": {

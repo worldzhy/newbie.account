@@ -178,10 +178,13 @@ export class AuthService {
             userName: user.name || 'Dear',
             link: `${this.config.get<string>(
               'framework.app.frontendUrl'
-            )}/auth/link/verify-email?token=${this.tokenService.sign(
-              {id: user.emails[0].id},
-              {subject: TokenSubject.APPROVE_EMAIL_TOKEN, expiresIn: '7d'}
-            )}`,
+            )}/auth/link/verify-email?token=${this.tokenService.sign({
+              payload: {id: user.emails[0].id},
+              options: {
+                subject: TokenSubject.APPROVE_EMAIL_TOKEN,
+                expiresIn: '7d',
+              },
+            })}`,
             linkValidDays: 7,
           },
         },
@@ -268,10 +271,13 @@ export class AuthService {
               locationName,
               link: `${
                 this.appFrontendUrl
-              }/auth/link/approve-subnet?token=${this.tokenService.sign(
-                {userId: params.userId},
-                {subject: TokenSubject.APPROVE_SUBNET_TOKEN, expiresIn: '30m'}
-              )}`,
+              }/auth/link/approve-subnet?token=${this.tokenService.sign({
+                payload: {userId: params.userId},
+                options: {
+                  subject: TokenSubject.APPROVE_SUBNET_TOKEN,
+                  expiresIn: '30m',
+                },
+              })}`,
               linkValidMinutes: 30,
             },
           },

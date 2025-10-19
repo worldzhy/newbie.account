@@ -9,28 +9,25 @@ import * as express from 'express';
 
 @Injectable()
 export class TokenService {
-  private accessTokenExpiresIn: string | number;
-  private refreshTokenExpiresIn: string | number;
+  private tokenConfig: any;
 
   constructor(private config: ConfigService) {
-    const token = this.config.getOrThrow('microservices.account.token');
-    this.accessTokenExpiresIn = token.userAccess.expiresIn;
-    this.refreshTokenExpiresIn = token.userRefresh.expiresIn;
+    this.tokenConfig = this.config.getOrThrow('microservices.account.token');
   }
 
   /**
    * Sign a JWT
    */
-  sign(
-    payload: number | string | object | Buffer,
-    options: {subject: string; expiresIn: string | number}
-  ) {
+  sign(params: {
+    payload: number | string | object | Buffer;
+    secret?: string | null;
+    options: {subject: string; expiresIn: string | number};
+  }) {
+    let {payload, secret, options} = params;
     if (typeof payload === 'number') payload = payload.toString();
-    return sign(
-      payload,
-      this.config.getOrThrow<string>('microservices.account.token.secret'),
-      options as any
-    );
+    if (!secret) secret = this.tokenConfig.defaultSecret as string;
+
+    return sign(payload, secret, options as any);
   }
 
   /**
@@ -101,9 +98,13 @@ export class TokenService {
    * Sign user access token
    */
   signUserAccessToken(payload: {userId: string}) {
-    return this.sign(payload, {
-      subject: TokenSubject.USER_ACCESS_TOKEN,
-      expiresIn: this.accessTokenExpiresIn as any,
+    return this.sign({
+      payload,
+      secret: this.tokenConfig.userAccess.secret,
+      options: {
+        subject: TokenSubject.USER_ACCESS_TOKEN,
+        expiresIn: this.tokenConfig.userAccess.expiresIn,
+      },
     });
   }
 
@@ -125,11 +126,15 @@ export class TokenService {
     payload: {userId: string},
     options?: {expiresIn: string | number}
   ) {
-    return this.sign(payload, {
-      subject: TokenSubject.USER_REFRESH_TOKEN,
-      expiresIn: options
-        ? (options.expiresIn as any)
-        : (this.refreshTokenExpiresIn as any),
+    return this.sign({
+      payload,
+      secret: this.tokenConfig.userRefresh.secret,
+      options: {
+        subject: TokenSubject.USER_REFRESH_TOKEN,
+        expiresIn: options
+          ? options.expiresIn
+          : this.tokenConfig.userRefresh.expiresIn,
+      },
     });
   }
 
