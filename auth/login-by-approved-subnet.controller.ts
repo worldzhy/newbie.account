@@ -41,8 +41,11 @@ export class LoginByApprovedSubnetController {
   ) {
     // [step 1] Verify token
     if (!token) throw new UnprocessableEntityException(NO_TOKEN_PROVIDED);
-    const {userId} = this.tokenService.verify<{userId: string}>(token, {
-      subject: TokenSubject.APPROVE_SUBNET_TOKEN,
+    const {userId} = this.tokenService.verify<{userId: string}>({
+      token,
+      options: {
+        subject: TokenSubject.APPROVE_SUBNET_TOKEN,
+      },
     });
 
     const user = await this.prisma.user.findUnique({where: {id: userId}});

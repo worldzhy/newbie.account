@@ -25,7 +25,7 @@ export class TokenService {
   }) {
     let {payload, secret, options} = params;
     if (typeof payload === 'number') payload = payload.toString();
-    if (!secret) secret = this.tokenConfig.defaultSecret as string;
+    secret = secret ?? (this.tokenConfig.defaultSecret as string);
 
     return sign(payload, secret, options as any);
   }
@@ -33,13 +33,16 @@ export class TokenService {
   /**
    * Verify and decode a JWT
    */
-  verify<T>(token: string, options: {subject: string}) {
+  verify<T>(params: {
+    token: string;
+    secret?: string | null;
+    options: {subject: string};
+  }) {
+    let {token, secret, options} = params;
+    secret = secret ?? (this.tokenConfig.defaultSecret as string);
+
     try {
-      return verify(
-        token,
-        this.config.get<string>('microservices.account.token.secret') ?? '',
-        options
-      ) as any as T;
+      return verify(token, secret, options) as any as T;
     } catch (error) {
       throw new UnauthorizedException(INVALID_TOKEN);
     }
@@ -114,8 +117,12 @@ export class TokenService {
    * If the token is invalid, it throws an UnauthorizedException
    */
   verifyUserAccessToken(token: string) {
-    return this.verify<{userId: string; iat: number; exp: number}>(token, {
-      subject: TokenSubject.USER_ACCESS_TOKEN,
+    return this.verify<{userId: string; iat: number; exp: number}>({
+      token,
+      secret: this.tokenConfig.userAccess.secret,
+      options: {
+        subject: TokenSubject.USER_ACCESS_TOKEN,
+      },
     });
   }
 
@@ -144,8 +151,12 @@ export class TokenService {
    * If the token is invalid, it throws an UnauthorizedException
    */
   verifyUserRefreshToken(token: string) {
-    return this.verify<{userId: string; iat: number; exp: number}>(token, {
-      subject: TokenSubject.USER_REFRESH_TOKEN,
+    return this.verify<{userId: string; iat: number; exp: number}>({
+      token,
+      secret: this.tokenConfig.userRefresh.secret,
+      options: {
+        subject: TokenSubject.USER_REFRESH_TOKEN,
+      },
     });
   }
 

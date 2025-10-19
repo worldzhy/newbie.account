@@ -28,8 +28,11 @@ export class SignupEmailVerifyController {
   async approveSubnet(@Body('token') token: string) {
     // [step 1] Verify token
     if (!token) throw new UnprocessableEntityException(NO_TOKEN_PROVIDED);
-    const {id} = this.tokenService.verify<{id: number}>(token, {
-      subject: TokenSubject.APPROVE_EMAIL_TOKEN,
+    const {id} = this.tokenService.verify<{id: number}>({
+      token,
+      options: {
+        subject: TokenSubject.APPROVE_EMAIL_TOKEN,
+      },
     });
 
     if (!id) throw new NotFoundException(EMAIL_NOT_FOUND);
