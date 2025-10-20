@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-custom';
 import {Request} from 'express';
@@ -36,7 +32,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
 
     // [step 1] Check if refresh token is provided
     if (!refreshToken) {
-      throw new UnprocessableEntityException(NO_TOKEN_PROVIDED);
+      throw new UnauthorizedException(NO_TOKEN_PROVIDED);
     }
 
     // [step 2] Verify that refresh token is in db
