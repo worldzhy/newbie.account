@@ -26,7 +26,7 @@ export class TokenService {
     let {payload, secret, options} = params;
     if (typeof payload === 'number') payload = payload.toString();
     secret = secret ?? (this.tokenConfig.defaultSecret as string);
-
+    console.log('Signing JWT with secret:', secret);
     return sign(payload, secret, options as any);
   }
 

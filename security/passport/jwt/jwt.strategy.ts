@@ -13,15 +13,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly prisma: PrismaService,
     private readonly tokenService: TokenService
   ) {
-    const defaultSecret = config.getOrThrow<string>(
-      'microservices.account.token.defaultSecret'
-    );
+    const tokenConfig = config.getOrThrow<{
+      defaultSecret: string;
+      userAccess: {secret: string; expiresIn: string | number};
+    }>('microservices.account.token');
 
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       passReqToCallback: true, // Pass request via the first parameter of validate
-      secretOrKey: defaultSecret,
+      secretOrKey: tokenConfig.userAccess.secret ?? tokenConfig.defaultSecret,
     });
   }
 
