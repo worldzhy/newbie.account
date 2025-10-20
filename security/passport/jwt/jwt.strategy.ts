@@ -1,4 +1,5 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
 import {PassportStrategy} from '@nestjs/passport';
 import {ExtractJwt, Strategy} from 'passport-jwt';
 import {Request} from 'express';
@@ -8,13 +9,19 @@ import {TokenService} from '../../token/token.service';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
+    private readonly config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly tokenService: TokenService
   ) {
+    const defaultSecret = config.getOrThrow<string>(
+      'microservices.account.token.defaultSecret'
+    );
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       passReqToCallback: true, // Pass request via the first parameter of validate
+      secretOrKey: defaultSecret,
     });
   }
 
