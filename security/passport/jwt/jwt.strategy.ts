@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       passReqToCallback: true, // Pass request via the first parameter of validate
-      secretOrKey: tokenConfig.userAccess.secret ?? tokenConfig.defaultSecret,
+      secretOrKey: tokenConfig.userAccess.secret || tokenConfig.defaultSecret,
     });
   }
 
