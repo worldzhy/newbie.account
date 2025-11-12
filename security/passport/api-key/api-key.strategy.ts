@@ -3,16 +3,10 @@ import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-custom';
 import {Request} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {
-  API_KEY_NOT_FOUND,
-  INVALID_CREDENTIALS,
-} from '@framework/exceptions/errors.constants';
+import {API_KEY_NOT_FOUND, INVALID_CREDENTIALS} from '@framework/exceptions/errors.constants';
 
 @Injectable()
-export class ApiKeyStrategy extends PassportStrategy(
-  Strategy,
-  'custom.api-key'
-) {
+export class ApiKeyStrategy extends PassportStrategy(Strategy, 'custom.api-key') {
   constructor(private readonly prisma: PrismaService) {
     super();
   }

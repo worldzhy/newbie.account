@@ -3,16 +3,10 @@ import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-local';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {UserService} from '@microservices/account/modules/user/user.service';
-import {
-  verifyEmail,
-  verifyPhone,
-} from '@microservices/account/helpers/validator';
+import {verifyEmail, verifyPhone} from '@microservices/account/helpers/validator';
 
 @Injectable()
-export class VerificationCodeStrategy extends PassportStrategy(
-  Strategy,
-  'local.verification-code'
-) {
+export class VerificationCodeStrategy extends PassportStrategy(Strategy, 'local.verification-code') {
   constructor(
     private readonly verificationCodeService: VerificationCodeService,
     private readonly userService: UserService
@@ -28,10 +22,7 @@ export class VerificationCodeStrategy extends PassportStrategy(
    * [2] phone
    *
    */
-  async validate(
-    account: string,
-    verificationCode: string
-  ): Promise<{userId: string}> {
+  async validate(account: string, verificationCode: string): Promise<{userId: string}> {
     // [step 1] Get the user.
     const user = await this.userService.findByAccount(account);
     if (!user) {
@@ -45,14 +36,8 @@ export class VerificationCodeStrategy extends PassportStrategy(
 
     // [step 3] Validate verification code.
     const isCodeValid = verifyEmail(account)
-      ? await this.verificationCodeService.validateForEmail(
-          verificationCode,
-          account
-        )
-      : await this.verificationCodeService.validateForPhone(
-          verificationCode,
-          account
-        );
+      ? await this.verificationCodeService.validateForEmail(verificationCode, account)
+      : await this.verificationCodeService.validateForPhone(verificationCode, account);
     if (!isCodeValid) {
       throw new UnauthorizedException('Invalid code.');
     }

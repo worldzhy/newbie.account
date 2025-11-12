@@ -4,14 +4,8 @@ import {Response} from 'express';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {GuardByPassword} from '@microservices/account/security/passport/password/password.decorator';
 import {UserRequest} from '@microservices/account/account.interface';
-import {
-  LimitLoginByIp,
-  LimitLoginByUser,
-} from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
-import {
-  LoginByPasswordRequestDto,
-  LoginByPasswordResponseDto,
-} from '@microservices/account/auth/auth.dto';
+import {LimitLoginByIp, LimitLoginByUser} from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
+import {LoginByPasswordRequestDto, LoginByPasswordResponseDto} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')

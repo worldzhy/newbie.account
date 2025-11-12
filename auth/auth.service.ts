@@ -84,25 +84,17 @@ export class AuthService {
     });
 
     // [step 4] Set refresh token in cookie.
-    this.cookieService.set(
-      params.response,
-      this.cookieService.generateForRefreshToken(session.refreshToken)
-    );
+    this.cookieService.set(params.response, this.cookieService.generateForRefreshToken(session.refreshToken));
 
     // [step 5] Return access token.
-    const accessTokenInfo = this.tokenService.verifyUserAccessToken(
-      session.accessToken
-    );
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(session.accessToken);
     return {
       token: session.accessToken,
       tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
     };
   }
 
-  async signup(params: {
-    ipAddress: string;
-    userData: SignUpDto;
-  }): Promise<Expose<User>> {
+  async signup(params: {ipAddress: string; userData: SignUpDto}): Promise<Expose<User>> {
     const {email, ...data} = params.userData;
 
     if (!verifyEmail(email)) {
@@ -128,9 +120,9 @@ export class AuthService {
     } else {
       uiAvatarsName = email.split('@')[0];
     }
-    const uiAvatarsUrl = `https://ui-avatars.com/api/?name=${uiAvatarsName}&background=${randomColor(
-      {luminosity: 'light'}
-    ).replace('#', '')}&color=000000`;
+    const uiAvatarsUrl = `https://ui-avatars.com/api/?name=${uiAvatarsName}&background=${randomColor({
+      luminosity: 'light',
+    }).replace('#', '')}&color=000000`;
 
     // Generate user gender
     if (!data.gender) {
@@ -142,16 +134,8 @@ export class AuthService {
             probability: number;
             count: number;
           }>(`https://api.genderize.io/?name=${data.name.split(' ')[0]}`);
-          if (
-            prediction.data.probability > 0.5 &&
-            prediction.data.gender === 'male'
-          )
-            data.gender = UserGender.MALE;
-          if (
-            prediction.data.probability > 0.5 &&
-            prediction.data.gender === 'female'
-          )
-            data.gender = UserGender.FEMALE;
+          if (prediction.data.probability > 0.5 && prediction.data.gender === 'male') data.gender = UserGender.MALE;
+          if (prediction.data.probability > 0.5 && prediction.data.gender === 'female') data.gender = UserGender.FEMALE;
         } catch (error) {}
       }
     }
@@ -191,10 +175,7 @@ export class AuthService {
       });
     }
 
-    await this.approvedSubnetService.approveNewSubnet(
-      user.id,
-      params.ipAddress
-    );
+    await this.approvedSubnetService.approveNewSubnet(user.id, params.ipAddress);
     return expose(user);
   }
 
@@ -203,15 +184,10 @@ export class AuthService {
     const session = await this.sessionService.refresh(params.refreshToken);
 
     // [step 2] Set refresh token in cookie.
-    this.cookieService.set(
-      params.response,
-      this.cookieService.generateForRefreshToken(session.refreshToken)
-    );
+    this.cookieService.set(params.response, this.cookieService.generateForRefreshToken(session.refreshToken));
 
     // [step 3] Return access token.
-    const accessTokenInfo = this.tokenService.verifyUserAccessToken(
-      session.accessToken
-    );
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(session.accessToken);
     return {
       token: session.accessToken,
       tokenExpiresInSeconds: accessTokenInfo.exp - accessTokenInfo.iat,
@@ -225,14 +201,10 @@ export class AuthService {
     });
     if (!user) throw new NotFoundException(USER_NOT_FOUND);
 
-    if (!user.emails.find(i => i.email === user.email)?.isVerified)
-      throw new UnauthorizedException(UNVERIFIED_EMAIL);
+    if (!user.emails.find(i => i.email === user.email)?.isVerified) throw new UnauthorizedException(UNVERIFIED_EMAIL);
   }
 
-  private async checkLocationOnLogin(params: {
-    userId: string;
-    ipAddress: string;
-  }): Promise<void> {
+  private async checkLocationOnLogin(params: {userId: string; ipAddress: string}): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: {id: params.userId},
       select: {email: true, name: true, checkLocationOnLogin: true},
@@ -246,20 +218,13 @@ export class AuthService {
     });
     let isApproved = false;
     for await (const item of previousSubnets) {
-      if (!isApproved)
-        if (await compareHash(subnet, item.subnet)) isApproved = true;
+      if (!isApproved) if (await compareHash(subnet, item.subnet)) isApproved = true;
     }
 
     if (!isApproved) {
-      const location = await this.geolocationService.getLocation(
-        params.ipAddress
-      );
+      const location = await this.geolocationService.getLocation(params.ipAddress);
       const locationName =
-        [
-          location?.city?.names?.en,
-          (location?.subdivisions ?? [])[0]?.names?.en,
-          location?.country?.names?.en,
-        ]
+        [location?.city?.names?.en, (location?.subdivisions ?? [])[0]?.names?.en, location?.country?.names?.en]
           .filter(i => i)
           .join(', ') || 'Unknown location';
       if (user.email) {
@@ -269,9 +234,7 @@ export class AuthService {
             'auth/verify-subnet': {
               userName: user.name ?? 'friend',
               locationName,
-              link: `${
-                this.appFrontendUrl
-              }/auth/link/approve-subnet?token=${this.tokenService.sign({
+              link: `${this.appFrontendUrl}/auth/link/approve-subnet?token=${this.tokenService.sign({
                 payload: {userId: params.userId},
                 options: {
                   subject: TokenSubject.APPROVE_SUBNET_TOKEN,

@@ -20,8 +20,7 @@ export class LoginByApiKeyController {
   @Post('login-by-apikey')
   @GuardByApiKey()
   @ApiBody({
-    description:
-      "The request body should contain 'key' and 'secret' attributes.",
+    description: "The request body should contain 'key' and 'secret' attributes.",
     examples: {
       a: {
         summary: '1. Log in with api key and secret',

@@ -14,10 +14,7 @@ export class RefreshAccessTokenController {
   @GuardByRefreshToken()
   @Get('refresh-access-token')
   @ApiCookieAuth()
-  async refresh(
-    @Cookies(CookieName.REFRESH_TOKEN) refreshToken: string,
-    @Res({passthrough: true}) response: Response
-  ) {
+  async refresh(@Cookies(CookieName.REFRESH_TOKEN) refreshToken: string, @Res({passthrough: true}) response: Response) {
     return await this.authService.refreshAccessToken({refreshToken, response});
   }
 

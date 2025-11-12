@@ -9,10 +9,7 @@ import {TokenService} from '@microservices/account/security/token/token.service'
 import {CookieName} from '@microservices/account/security/cookie/cookie.service';
 
 @Injectable()
-export class RefreshTokenStrategy extends PassportStrategy(
-  Strategy,
-  'custom.refresh-token'
-) {
+export class RefreshTokenStrategy extends PassportStrategy(Strategy, 'custom.refresh-token') {
   constructor(
     private readonly prisma: PrismaService,
     private readonly sessionService: SessionService,
@@ -26,9 +23,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
    */
   async validate(req: Request): Promise<boolean> {
     // [step 0] Extract refresh token from cookie or body
-    const refreshToken: string =
-      req.cookies[CookieName.REFRESH_TOKEN] ||
-      req.body[CookieName.REFRESH_TOKEN];
+    const refreshToken: string = req.cookies[CookieName.REFRESH_TOKEN] || req.body[CookieName.REFRESH_TOKEN];
 
     // [step 1] Check if refresh token is provided
     if (!refreshToken) {

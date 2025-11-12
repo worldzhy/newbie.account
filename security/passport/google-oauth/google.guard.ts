@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ExecutionContext,
-  Injectable,
-} from '@nestjs/common';
+import {BadRequestException, ExecutionContext, Injectable} from '@nestjs/common';
 import {AuthGuard} from '@nestjs/passport';
 
 @Injectable()
@@ -12,8 +8,7 @@ export class GoogleAuthGuard extends AuthGuard('google') {
   }
 
   handleRequest(err: BadRequestException, user: any) {
-    if (err)
-      throw new BadRequestException('Google authorization verification failed');
+    if (err) throw new BadRequestException('Google authorization verification failed');
     return user;
   }
 }

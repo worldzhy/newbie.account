@@ -47,65 +47,64 @@ export class PassportGuard extends AuthGuard('authentication') {
     }
 
     // Use @GuardByPassword() for local.password strategy authentication
-    const isLoggingInByPassword = this.reflector.getAllAndOverride<boolean>(
-      IS_LOGGING_IN_PASSWORD_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isLoggingInByPassword = this.reflector.getAllAndOverride<boolean>(IS_LOGGING_IN_PASSWORD_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (isLoggingInByPassword) {
       return this.passwordAuthGuard.canActivate(context);
     }
 
     // Use @GuardByApiKey() for custom.api-key endpoint authentication
-    const isLoggingInByApiKey = this.reflector.getAllAndOverride<boolean>(
-      IS_LOGGING_IN_APIKEY_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isLoggingInByApiKey = this.reflector.getAllAndOverride<boolean>(IS_LOGGING_IN_APIKEY_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (isLoggingInByApiKey) {
       return this.apiKeyAuthGuard.canActivate(context);
     }
 
     // Use @GuardByProfile() for custom.profile strategy authentication
-    const isLoggingInByProfile = this.reflector.getAllAndOverride<boolean>(
-      IS_LOGGING_IN_PROFILE_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isLoggingInByProfile = this.reflector.getAllAndOverride<boolean>(IS_LOGGING_IN_PROFILE_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (isLoggingInByProfile) {
       return this.profileAuthGuard.canActivate(context);
     }
 
     // Use @GuardByUuid() for custom.uuid strategy authentication
-    const isLoggingInByUuid = this.reflector.getAllAndOverride<boolean>(
-      IS_LOGGING_IN_UUID_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isLoggingInByUuid = this.reflector.getAllAndOverride<boolean>(IS_LOGGING_IN_UUID_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (isLoggingInByUuid) {
       return this.uuidAuthGuard.canActivate(context);
     }
 
     // Use @GuardByVerificationCode() for local.verification-code strategy authentication
-    const isLoggingInByVerificationCode =
-      this.reflector.getAllAndOverride<boolean>(
-        IS_LOGGING_IN_VERIFICATION_CODE_KEY,
-        [context.getHandler(), context.getClass()]
-      );
+    const isLoggingInByVerificationCode = this.reflector.getAllAndOverride<boolean>(
+      IS_LOGGING_IN_VERIFICATION_CODE_KEY,
+      [context.getHandler(), context.getClass()]
+    );
     if (isLoggingInByVerificationCode) {
       return this.verificationCodeAuthGuard.canActivate(context);
     }
 
     // Use @GuardByRefreshToken() for refresh endpoint authentication
-    const isRefreshingAccessToken = this.reflector.getAllAndOverride<boolean>(
-      IS_REFRESHING_ACCESS_TOKEN_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isRefreshingAccessToken = this.reflector.getAllAndOverride<boolean>(IS_REFRESHING_ACCESS_TOKEN_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (isRefreshingAccessToken) {
       return this.refreshTokenAuthGuard.canActivate(context);
     }
 
     // Use @GuardByGoogle() for google-oauth strategy authentication
-    const isLoggingInByGoogle = this.reflector.getAllAndOverride<boolean>(
-      IS_LOGGING_IN_GOOGLE_KEY,
-      [context.getHandler(), context.getClass()]
-    );
+    const isLoggingInByGoogle = this.reflector.getAllAndOverride<boolean>(IS_LOGGING_IN_GOOGLE_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (isLoggingInByGoogle) {
       return this.googleAuthGuard.canActivate(context);
     }

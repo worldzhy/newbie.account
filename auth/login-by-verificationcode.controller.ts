@@ -1,26 +1,11 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Res,
-  NotFoundException,
-  Ip,
-  Headers,
-  Req,
-} from '@nestjs/common';
+import {Controller, Post, Body, Res, NotFoundException, Ip, Headers, Req} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {VerificationCodeUse} from '@prisma/client';
 import {Response} from 'express';
-import {
-  NewbieException,
-  NewbieExceptionType,
-} from '@framework/exceptions/newbie.exception';
+import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
 import {UserRequest} from '@microservices/account/account.interface';
 import {AuthService} from '@microservices/account/auth/auth.service';
-import {
-  verifyEmail,
-  verifyPhone,
-} from '@microservices/account/helpers/validator';
+import {verifyEmail, verifyPhone} from '@microservices/account/helpers/validator';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
 import {GuardByVerificationCode} from '@microservices/account/security/passport/verification-code/verification-code.decorator';
 import {UserService} from '@microservices/account/modules/user/user.service';
@@ -81,11 +66,7 @@ export class LoginByVerificationCodeController {
       }
 
       // [step 2] Generate verification code.
-      const verificationCode =
-        await this.verificationCodeService.generateForEmail(
-          body.email,
-          body.use
-        );
+      const verificationCode = await this.verificationCodeService.generateForEmail(body.email, body.use);
 
       // [step 3] Send verification code.
       await this.ses.sendEmailWithTemplate({
@@ -106,11 +87,7 @@ export class LoginByVerificationCodeController {
       }
 
       // [step 2] Generate verification code.
-      const verificationCode =
-        await this.verificationCodeService.generateForPhone(
-          body.phone,
-          body.use
-        );
+      const verificationCode = await this.verificationCodeService.generateForPhone(body.phone, body.use);
 
       // [step 3] Send verification code.
       await this.sms.sendText({

@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Put,
-  Query,
-  Req,
-} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 import {ApiKey, Prisma} from '@prisma/client';
 import {CursorPipe} from '@framework/pipes/cursor.pipe';
@@ -18,11 +7,7 @@ import {WherePipe} from '@framework/pipes/where.pipe';
 import {Expose} from '../../helpers/expose';
 import {AuditLog} from '../audit-logs/audit-log.decorator';
 import {GuardByApiKey} from '../../security/passport/api-key/api-key.decorator';
-import {
-  CreateApiKeyDto,
-  ReplaceApiKeyDto,
-  UpdateApiKeyDto,
-} from './api-key.dto';
+import {CreateApiKeyDto, ReplaceApiKeyDto, UpdateApiKeyDto} from './api-key.dto';
 import {ApiKeyService} from './api-key.service';
 
 @ApiTags('Account / Api Key')
@@ -34,10 +19,7 @@ export class ApiKeyController {
   /** Create an API key for a team */
   @Post()
   @AuditLog('create-api-key')
-  async create(
-    @Param('userId') userId: string,
-    @Body() data: CreateApiKeyDto
-  ): Promise<Expose<ApiKey>> {
+  async create(@Param('userId') userId: string, @Body() data: CreateApiKeyDto): Promise<Expose<ApiKey>> {
     return await this.apiKeyService.createApiKey({userId, data});
   }
 
@@ -64,10 +46,7 @@ export class ApiKeyController {
 
   /** Get an API key */
   @Get(':id')
-  async get(
-    @Param('userId') userId: string,
-    @Param('id') id: number
-  ): Promise<Expose<ApiKey>> {
+  async get(@Param('userId') userId: string, @Param('id') id: number): Promise<Expose<ApiKey>> {
     return await this.apiKeyService.getApiKeyForUser(userId, id);
   }
 
@@ -96,10 +75,7 @@ export class ApiKeyController {
   /** Delete an API key */
   @Delete(':id')
   @AuditLog('delete-api-key')
-  async remove(
-    @Param('userId') userId: string,
-    @Param('id') id: number
-  ): Promise<Expose<ApiKey>> {
+  async remove(@Param('userId') userId: string, @Param('id') id: number): Promise<Expose<ApiKey>> {
     return await this.apiKeyService.deleteApiKey(userId, id);
   }
 

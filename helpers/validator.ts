@@ -15,10 +15,7 @@ export function verifyUsername(username: string): boolean {
   }
 
   // [step 2] username must not be email or phone to make sure email and phone can represent unique account.
-  if (
-    validator.isEmail(username) ||
-    validator.isMobilePhone(username, ['en-US', 'zh-CN'])
-  ) {
+  if (validator.isEmail(username) || validator.isMobilePhone(username, ['en-US', 'zh-CN'])) {
     return false;
   }
 

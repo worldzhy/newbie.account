@@ -3,17 +3,11 @@ import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-local';
 import {compareHash} from '@framework/utilities/common.util';
 import {UserService} from '@microservices/account/modules/user/user.service';
-import {
-  NewbieException,
-  NewbieExceptionType,
-} from '@framework/exceptions/newbie.exception';
+import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
 import {UserStatus} from '@prisma/client';
 
 @Injectable()
-export class PasswordStrategy extends PassportStrategy(
-  Strategy,
-  'local.password'
-) {
+export class PasswordStrategy extends PassportStrategy(Strategy, 'local.password') {
   constructor(private readonly userService: UserService) {
     super({usernameField: 'account', passwordField: 'password'});
   }

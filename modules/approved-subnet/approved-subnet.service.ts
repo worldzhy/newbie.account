@@ -1,16 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import type {Prisma} from '@prisma/client';
 import {ApprovedSubnet} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import * as anonymize from 'ip-anonymize';
-import {
-  APPROVED_SUBNET_NOT_FOUND,
-  UNAUTHORIZED_RESOURCE,
-} from '@framework/exceptions/errors.constants';
+import {APPROVED_SUBNET_NOT_FOUND, UNAUTHORIZED_RESOURCE} from '@framework/exceptions/errors.constants';
 import {Expose, expose} from '../../helpers/expose';
 import {GeolocationService} from '../../helpers/geolocation.service';
 import {compareHash, generateHash} from '@framework/utilities/common.util';
@@ -47,31 +40,22 @@ export class ApprovedSubnetService {
     }
   }
 
-  async getApprovedSubnet(
-    userId: string,
-    id: number
-  ): Promise<Expose<ApprovedSubnet>> {
+  async getApprovedSubnet(userId: string, id: number): Promise<Expose<ApprovedSubnet>> {
     const ApprovedSubnet = await this.prisma.approvedSubnet.findUnique({
       where: {id},
     });
     if (!ApprovedSubnet) throw new NotFoundException(APPROVED_SUBNET_NOT_FOUND);
-    if (ApprovedSubnet.userId !== userId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (ApprovedSubnet.userId !== userId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     if (!ApprovedSubnet) throw new NotFoundException(APPROVED_SUBNET_NOT_FOUND);
     return expose<ApprovedSubnet>(ApprovedSubnet);
   }
 
-  async deleteApprovedSubnet(
-    userId: string,
-    id: number
-  ): Promise<Expose<ApprovedSubnet>> {
+  async deleteApprovedSubnet(userId: string, id: number): Promise<Expose<ApprovedSubnet>> {
     const testApprovedSubnet = await this.prisma.approvedSubnet.findUnique({
       where: {id},
     });
-    if (!testApprovedSubnet)
-      throw new NotFoundException(APPROVED_SUBNET_NOT_FOUND);
-    if (testApprovedSubnet.userId !== userId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (!testApprovedSubnet) throw new NotFoundException(APPROVED_SUBNET_NOT_FOUND);
+    if (testApprovedSubnet.userId !== userId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     const ApprovedSubnet = await this.prisma.approvedSubnet.delete({
       where: {id},
     });
@@ -98,17 +82,13 @@ export class ApprovedSubnetService {
    * Upsert a new subnet
    * If this subnet already exists, skip; otherwise add it
    */
-  async upsertNewSubnet(
-    userId: string,
-    ipAddress: string
-  ): Promise<Expose<ApprovedSubnet>> {
+  async upsertNewSubnet(userId: string, ipAddress: string): Promise<Expose<ApprovedSubnet>> {
     const subnet = anonymize(ipAddress);
     const previousSubnets = await this.prisma.approvedSubnet.findMany({
       where: {user: {id: userId}},
     });
     for await (const item of previousSubnets) {
-      if (await compareHash(subnet, item.subnet))
-        return expose<ApprovedSubnet>(item);
+      if (await compareHash(subnet, item.subnet)) return expose<ApprovedSubnet>(item);
     }
     return await this.approveNewSubnet(userId, ipAddress);
   }

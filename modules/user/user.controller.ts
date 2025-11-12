@@ -1,14 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Body,
-  Param,
-  Query,
-  BadRequestException,
-} from '@nestjs/common';
+import {Controller, Delete, Get, Patch, Post, Body, Param, Query, BadRequestException} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {PermissionAction, Prisma, User, UserRole} from '@prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
@@ -102,8 +92,7 @@ export class UserController {
   @Patch(':userId')
   @RequirePermission(PermissionAction.Update, Prisma.ModelName.User)
   @ApiBody({
-    description:
-      'Set roleIds with an empty array to remove all the roles of the user.',
+    description: 'Set roleIds with an empty array to remove all the roles of the user.',
     examples: {
       a: {
         summary: '1. Update',
@@ -117,10 +106,7 @@ export class UserController {
       },
     },
   })
-  async updateUser(
-    @Param('userId') userId: string,
-    @Body() body: Prisma.UserUpdateInput
-  ) {
+  async updateUser(@Param('userId') userId: string, @Body() body: Prisma.UserUpdateInput) {
     return await this.prisma.user.update({
       where: {id: userId},
       data: body,
@@ -138,8 +124,7 @@ export class UserController {
   @Patch(':userId/change-password')
   @RequirePermission(PermissionAction.Update, Prisma.ModelName.User)
   @ApiBody({
-    description:
-      "The 'userId', 'currentPassword' and 'newPassword' are required in request body.",
+    description: "The 'userId', 'currentPassword' and 'newPassword' are required in request body.",
     examples: {
       a: {
         summary: '1. new password != current password',
@@ -157,22 +142,15 @@ export class UserController {
       },
     },
   })
-  async changePassword(
-    @Param('userId') userId: string,
-    @Body() body: {currentPassword: string; newPassword: string}
-  ) {
+  async changePassword(@Param('userId') userId: string, @Body() body: {currentPassword: string; newPassword: string}) {
     // [step 1] Guard statement.
     if (!('currentPassword' in body) || !('newPassword' in body)) {
-      throw new BadRequestException(
-        "Please carry 'currentPassword' and 'newPassword' in the request body."
-      );
+      throw new BadRequestException("Please carry 'currentPassword' and 'newPassword' in the request body.");
     }
 
     // [step 2] Verify if the new password is same with the current password.
     if (body.currentPassword.trim() === body.newPassword.trim()) {
-      throw new BadRequestException(
-        'The new password is same with the current password.'
-      );
+      throw new BadRequestException('The new password is same with the current password.');
     }
 
     // [step 3] Verify the current password.

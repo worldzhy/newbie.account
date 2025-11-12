@@ -24,8 +24,7 @@ export class LoginByGoogleController {
   @GuardByGoogle()
   @Get('login-by-google/redirect')
   async googleOAuthredirect(@Req() req) {
-    if (!req.user)
-      return new NotFoundException('User google account not found');
+    if (!req.user) return new NotFoundException('User google account not found');
     return {
       status: 'success',
       message: 'Login successfully',

@@ -11,10 +11,7 @@ import {
 import {ApiTags} from '@nestjs/swagger';
 import {Response} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {
-  NO_TOKEN_PROVIDED,
-  USER_NOT_FOUND,
-} from '@framework/exceptions/errors.constants';
+import {NO_TOKEN_PROVIDED, USER_NOT_FOUND} from '@framework/exceptions/errors.constants';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {ApprovedSubnetService} from '@microservices/account/modules/approved-subnet/approved-subnet.service';
 import {TokenService} from '@microservices/account/security/token/token.service';

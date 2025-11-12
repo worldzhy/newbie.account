@@ -5,10 +5,7 @@ import {Request} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
 
 @Injectable()
-export class ProfileStrategy extends PassportStrategy(
-  Strategy,
-  'custom.user-profile'
-) {
+export class ProfileStrategy extends PassportStrategy(Strategy, 'custom.user-profile') {
   constructor(private readonly prisma: PrismaService) {
     super();
   }
@@ -21,9 +18,7 @@ export class ProfileStrategy extends PassportStrategy(
     const profile = req.body;
     const {firstName, middleName, lastName, dateOfBirth} = profile;
     if ((firstName && middleName && lastName && dateOfBirth) === undefined) {
-      throw new UnauthorizedException(
-        'The firstName, middleName, lastName and dateOfBirth are required.'
-      );
+      throw new UnauthorizedException('The firstName, middleName, lastName and dateOfBirth are required.');
     }
 
     // [step 2] Get profiles.

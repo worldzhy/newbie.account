@@ -1,8 +1,5 @@
 import {generateHash} from '@framework/utilities/common.util';
-import {
-  verifyEmail,
-  verifyPassword,
-} from '@microservices/account/helpers/validator';
+import {verifyEmail, verifyPassword} from '@microservices/account/helpers/validator';
 import {BadRequestException} from '@nestjs/common';
 import {Prisma} from '@prisma/client';
 

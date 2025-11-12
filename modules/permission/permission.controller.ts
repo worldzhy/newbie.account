@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Body,
-  Param,
-  Query,
-} from '@nestjs/common';
+import {Controller, Delete, Get, Patch, Post, Body, Param, Query} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
 import {Permission, PermissionAction, Prisma} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
@@ -43,9 +34,7 @@ export class PermissionController {
       },
     },
   })
-  async createPermission(
-    @Body() body: Prisma.PermissionCreateInput
-  ): Promise<Permission> {
+  async createPermission(@Body() body: Prisma.PermissionCreateInput): Promise<Permission> {
     return await this.prisma.permission.create({
       data: body,
     });
@@ -80,9 +69,7 @@ export class PermissionController {
   }
 
   @Get(':permissionId')
-  async getPermission(
-    @Param('permissionId') permissionId: number
-  ): Promise<Permission> {
+  async getPermission(@Param('permissionId') permissionId: number): Promise<Permission> {
     return await this.prisma.permission.findUniqueOrThrow({
       where: {id: permissionId},
     });
@@ -114,9 +101,7 @@ export class PermissionController {
   }
 
   @Delete(':permissionId')
-  async deletePermission(
-    @Param('permissionId') permissionId: number
-  ): Promise<Permission> {
+  async deletePermission(@Param('permissionId') permissionId: number): Promise<Permission> {
     return await this.prisma.permission.delete({
       where: {id: permissionId},
     });

@@ -11,10 +11,4 @@ export function expose<T>(item: T): Expose<T> {
   return item;
 }
 
-export type Expose<T> = Omit<
-  Omit<
-    Omit<Omit<Omit<T, 'password'>, 'twoFactorSecret'>, 'token'>,
-    'emailSafe'
-  >,
-  'subnet'
->;
+export type Expose<T> = Omit<Omit<Omit<Omit<Omit<T, 'password'>, 'twoFactorSecret'>, 'token'>, 'emailSafe'>, 'subnet'>;

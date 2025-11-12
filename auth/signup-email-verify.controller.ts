@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UnprocessableEntityException,
-  NotFoundException,
-} from '@nestjs/common';
+import {Controller, Post, Body, UnprocessableEntityException, NotFoundException} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
-import {
-  NO_TOKEN_PROVIDED,
-  EMAIL_NOT_FOUND,
-} from '@framework/exceptions/errors.constants';
+import {NO_TOKEN_PROVIDED, EMAIL_NOT_FOUND} from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {TokenSubject} from '@microservices/account/security/token/token.constants';

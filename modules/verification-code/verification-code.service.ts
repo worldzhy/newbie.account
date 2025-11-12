@@ -1,10 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {
-  VerificationCode,
-  VerificationCodeStatus,
-  VerificationCodeUse,
-} from '@prisma/client';
+import {VerificationCode, VerificationCodeStatus, VerificationCodeUse} from '@prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {currentPlusMinutes} from '@framework/utilities/datetime.util';
 import {generateRandomNumbers} from '@framework/utilities/common.util';
@@ -20,18 +16,11 @@ export class VerificationCodeService {
     private readonly config: ConfigService,
     private readonly prisma: PrismaService
   ) {
-    this.timeoutMinutes = this.config.getOrThrow<number>(
-      'microservices.account.verificationCode.timeoutMinutes'
-    );
-    this.resendMinutes = this.config.getOrThrow<number>(
-      'microservices.account.verificationCode.resendMinutes'
-    );
+    this.timeoutMinutes = this.config.getOrThrow<number>('microservices.account.verificationCode.timeoutMinutes');
+    this.resendMinutes = this.config.getOrThrow<number>('microservices.account.verificationCode.resendMinutes');
   }
 
-  async generateForEmail(
-    email: string,
-    use: VerificationCodeUse
-  ): Promise<VerificationCode> {
+  async generateForEmail(email: string, use: VerificationCodeUse): Promise<VerificationCode> {
     // [step 1] Return verification code generated within 1 minute.
     const validCode = await this.prisma.verificationCode.findFirst({
       where: {
@@ -70,10 +59,7 @@ export class VerificationCodeService {
     });
   }
 
-  async generateForPhone(
-    phone: string,
-    use: VerificationCodeUse
-  ): Promise<VerificationCode> {
+  async generateForPhone(phone: string, use: VerificationCodeUse): Promise<VerificationCode> {
     // [step 1] Return verification code generated within 1 minute.
     const validCode = await this.prisma.verificationCode.findFirst({
       where: {

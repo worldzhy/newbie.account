@@ -1,15 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {Prisma} from '@prisma/client';
 import {ApiKey} from '@prisma/client';
-import {
-  API_KEY_NOT_FOUND,
-  UNAUTHORIZED_RESOURCE,
-} from '@framework/exceptions/errors.constants';
+import {API_KEY_NOT_FOUND, UNAUTHORIZED_RESOURCE} from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {generateRandomString} from '@framework/utilities/random.util';
 import {Expose, expose} from '../../helpers/expose';
@@ -24,9 +17,7 @@ export class ApiKeyService {
     private configService: ConfigService
   ) {
     this.lru = new LRUCache({
-      maxSize: this.configService.getOrThrow<number>(
-        'microservices.account.cache.apiKeyLruSize'
-      ),
+      maxSize: this.configService.getOrThrow<number>('microservices.account.cache.apiKeyLruSize'),
       sizeCalculation: (value, key) => JSON.stringify(value).length,
     });
   }
@@ -34,10 +25,7 @@ export class ApiKeyService {
   async createApiKey(params: {
     userId: string;
     organizationId?: string;
-    data: Omit<
-      Omit<Prisma.ApiKeyCreateInput, 'key' | 'secret'>,
-      'user' | 'organization'
-    >;
+    data: Omit<Omit<Prisma.ApiKeyCreateInput, 'key' | 'secret'>, 'user' | 'organization'>;
   }): Promise<ApiKey> {
     const key = await generateRandomString();
     const secret = await generateRandomString();
@@ -102,16 +90,12 @@ export class ApiKeyService {
     }
   }
 
-  async getApiKeyForOrganization(
-    organizationId: string,
-    id: number
-  ): Promise<Expose<ApiKey>> {
+  async getApiKeyForOrganization(organizationId: string, id: number): Promise<Expose<ApiKey>> {
     const apiKey = await this.prisma.apiKey.findUnique({
       where: {id},
     });
     if (!apiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
-    if (apiKey.organizationId !== organizationId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (apiKey.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     return expose<ApiKey>(apiKey);
   }
 
@@ -120,8 +104,7 @@ export class ApiKeyService {
       where: {id},
     });
     if (!apiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
-    if (apiKey.userId !== userId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (apiKey.userId !== userId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     return expose<ApiKey>(apiKey);
   }
 
@@ -135,17 +118,12 @@ export class ApiKeyService {
     return expose<ApiKey>(apiKey);
   }
 
-  async updateApiKey(
-    userId: string,
-    id: number,
-    data: Prisma.ApiKeyUpdateInput
-  ): Promise<Expose<ApiKey>> {
+  async updateApiKey(userId: string, id: number, data: Prisma.ApiKeyUpdateInput): Promise<Expose<ApiKey>> {
     const testApiKey = await this.prisma.apiKey.findUnique({
       where: {id},
     });
     if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
-    if (testApiKey.userId !== userId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (testApiKey.userId !== userId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     const apiKey = await this.prisma.apiKey.update({
       where: {id},
       data,
@@ -159,8 +137,7 @@ export class ApiKeyService {
       where: {id},
     });
     if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
-    if (testApiKey.userId !== userId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (testApiKey.userId !== userId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     const apiKey = await this.prisma.apiKey.delete({
       where: {id},
     });
@@ -181,8 +158,7 @@ export class ApiKeyService {
       where: {id},
     });
     if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
-    if (testApiKey.organizationId !== organizationId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (testApiKey.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     return await this.getApiLogsFromKey(testApiKey.key, params);
   }
   async getApiKeyLogs(
@@ -198,8 +174,7 @@ export class ApiKeyService {
       where: {id},
     });
     if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
-    if (testApiKey.userId !== userId)
-      throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    if (testApiKey.userId !== userId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
     return await this.getApiLogsFromKey(testApiKey.key, params);
   }
 
@@ -213,10 +188,7 @@ export class ApiKeyService {
   ): Promise<Record<string, any>[]> {
     const now = new Date();
     now.setDate(
-      now.getDate() -
-        this.configService.getOrThrow<number>(
-          'microservices.account.tracking.deleteOldLogsDays'
-        )
+      now.getDate() - this.configService.getOrThrow<number>('microservices.account.tracking.deleteOldLogsDays')
     );
 
     /*

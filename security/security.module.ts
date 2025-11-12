@@ -63,10 +63,6 @@ import {
     LimitLoginByIpService,
     LimitLoginByUserService,
   ],
-  exports: [
-    LimitAccessByIpService,
-    LimitLoginByIpService,
-    LimitLoginByUserService,
-  ],
+  exports: [LimitAccessByIpService, LimitLoginByIpService, LimitLoginByUserService],
 })
 export class SecurityModule {}

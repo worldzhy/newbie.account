@@ -16,8 +16,7 @@ export class CookieService {
   ) {}
 
   generateForRefreshToken(refreshToken: string) {
-    const refreshTokenInfo =
-      this.tokenService.verifyUserRefreshToken(refreshToken);
+    const refreshTokenInfo = this.tokenService.verifyUserRefreshToken(refreshToken);
 
     return this.generate({
       name: CookieName.REFRESH_TOKEN,
@@ -37,10 +36,7 @@ export class CookieService {
     };
   }
 
-  set(
-    response: Response,
-    cookie: {name: string; value: string; options: CookieOptions}
-  ) {
+  set(response: Response, cookie: {name: string; value: string; options: CookieOptions}) {
     response.cookie(cookie.name, cookie.value, cookie.options);
   }
 
@@ -49,9 +45,7 @@ export class CookieService {
   }
 
   defaultCookieOptions(): CookieOptions {
-    const frontendUrl = this.config.getOrThrow<string>(
-      'framework.app.frontendUrl'
-    );
+    const frontendUrl = this.config.getOrThrow<string>('framework.app.frontendUrl');
 
     return {
       httpOnly: true,

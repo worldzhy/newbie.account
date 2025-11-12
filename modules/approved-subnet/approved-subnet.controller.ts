@@ -33,19 +33,13 @@ export class ApprovedSubnetController {
 
   /** Get an approved subnet for a user */
   @Get(':id')
-  async get(
-    @Param('userId') userId: string,
-    @Param('id') id: number
-  ): Promise<Expose<ApprovedSubnet>> {
+  async get(@Param('userId') userId: string, @Param('id') id: number): Promise<Expose<ApprovedSubnet>> {
     return await this.approvedSubnetsService.getApprovedSubnet(userId, id);
   }
 
   /** Delete an approved subnet for a user */
   @Delete(':id')
-  async remove(
-    @Param('userId') userId: string,
-    @Param('id') id: number
-  ): Promise<Expose<ApprovedSubnet>> {
+  async remove(@Param('userId') userId: string, @Param('id') id: number): Promise<Expose<ApprovedSubnet>> {
     return await this.approvedSubnetsService.deleteApprovedSubnet(userId, id);
   }
 }

@@ -11,10 +11,8 @@ export class GeolocationService implements OnModuleDestroy {
 
   constructor(private config: ConfigService) {
     this.lru = new LRUCache({
-      maxSize: this.config.getOrThrow<number>(
-        'microservices.account.cache.geolocationLruSize'
-      ),
-      sizeCalculation: (value, key) => JSON.stringify(value).length
+      maxSize: this.config.getOrThrow<number>('microservices.account.cache.geolocationLruSize'),
+      sizeCalculation: (value, key) => JSON.stringify(value).length,
     });
   }
 
@@ -30,14 +28,10 @@ export class GeolocationService implements OnModuleDestroy {
     return result;
   }
 
-  private async getSafeLocation(
-    ipAddress: string
-  ): Promise<Partial<CityResponse>> {
+  private async getSafeLocation(ipAddress: string): Promise<Partial<CityResponse>> {
     try {
       if (!this.reader) {
-        this.reader = await geolite2.open(GeoIpDbName.City, path =>
-          maxmind.open<CityResponse>(path)
-        );
+        this.reader = await geolite2.open(GeoIpDbName.City, path => maxmind.open<CityResponse>(path));
       }
       return this.reader.get(ipAddress) ?? {};
     } catch (error) {

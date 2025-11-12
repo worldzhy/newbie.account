@@ -12,12 +12,7 @@ export class WechatAuthService {
     private readonly tokenService: TokenService
   ) {}
 
-  async login(params: {
-    ipAddress: string;
-    userAgent: string;
-    phone: string;
-    openId: string;
-  }) {
+  async login(params: {ipAddress: string; userAgent: string; phone: string; openId: string}) {
     const {ipAddress, userAgent, phone, openId} = params;
 
     // [step 1] Get user
@@ -45,9 +40,7 @@ export class WechatAuthService {
       userId: user.id,
     });
 
-    const accessTokenInfo = this.tokenService.verifyUserAccessToken(
-      session.accessToken
-    );
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(session.accessToken);
 
     // [step 4] Return tokens.
     return {
@@ -63,9 +56,7 @@ export class WechatAuthService {
     const session = await this.sessionService.refresh(params.refreshToken);
 
     // [step 2] Verify access token
-    const accessTokenInfo = this.tokenService.verifyUserAccessToken(
-      session.accessToken
-    );
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(session.accessToken);
 
     // [step 3] Return access token.
     return {

@@ -32,17 +32,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
    * For the jwt-strategy, Passport first verifies the JWT's signature and decodes the JSON.
    * Then it invokes our validate() method passing the decoded JSON as its single parameter
    */
-  async validate(
-    req: Request,
-    payload: {userId: string; sub: string; iat: number; exp: number}
-  ) {
+  async validate(req: Request, payload: {userId: string; sub: string; iat: number; exp: number}) {
     const accessToken = this.tokenService.getTokenFromHttpRequest(req);
     if (!accessToken) {
       throw new UnauthorizedException('No access token');
     }
 
-    const accessTokenInfo =
-      this.tokenService.verifyUserAccessToken(accessToken);
+    const accessTokenInfo = this.tokenService.verifyUserAccessToken(accessToken);
 
     const session = await this.prisma.session.findFirst({
       where: {accessToken},

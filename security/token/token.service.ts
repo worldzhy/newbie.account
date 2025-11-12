@@ -33,11 +33,7 @@ export class TokenService {
   /**
    * Verify and decode a JWT
    */
-  verify<T>(params: {
-    token: string;
-    secret?: string | null;
-    options: {subject: string};
-  }) {
+  verify<T>(params: {token: string; secret?: string | null; options: {subject: string}}) {
     let {token, secret, options} = params;
     secret = secret ?? (this.tokenConfig.defaultSecret as string);
 
@@ -68,20 +64,11 @@ export class TokenService {
    * @param length - Length of returned string
    * @param charactersOrType - Characters or one of the supported types
    */
-  async generateRandomString(
-    length = 32,
-    charactersOrType = 'alphanumeric'
-  ): Promise<string> {
+  async generateRandomString(length = 32, charactersOrType = 'alphanumeric'): Promise<string> {
     if (
-      [
-        'hex',
-        'base64',
-        'url-safe',
-        'numeric',
-        'distinguishable',
-        'ascii-printable',
-        'alphanumeric',
-      ].includes(charactersOrType)
+      ['hex', 'base64', 'url-safe', 'numeric', 'distinguishable', 'ascii-printable', 'alphanumeric'].includes(
+        charactersOrType
+      )
     )
       return cryptoRandomString({
         length,
@@ -129,18 +116,13 @@ export class TokenService {
   /**
    * Sign user refresh token
    */
-  signUserRefreshToken(
-    payload: {userId: string},
-    options?: {expiresIn: string | number}
-  ) {
+  signUserRefreshToken(payload: {userId: string}, options?: {expiresIn: string | number}) {
     return this.sign({
       payload,
       secret: this.tokenConfig.userRefresh.secret,
       options: {
         subject: TokenSubject.USER_REFRESH_TOKEN,
-        expiresIn: options
-          ? options.expiresIn
-          : this.tokenConfig.userRefresh.expiresIn,
+        expiresIn: options ? options.expiresIn : this.tokenConfig.userRefresh.expiresIn,
       },
     });
   }
