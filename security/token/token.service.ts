@@ -90,7 +90,7 @@ export class TokenService {
   signUserAccessToken(payload: {userId: string}) {
     return this.sign({
       payload,
-      secret: this.tokenConfig.userAccess.secret,
+      secret: this.tokenConfig.userAccess.secret || this.tokenConfig.defaultSecret,
       options: {
         subject: TokenSubject.USER_ACCESS_TOKEN,
         expiresIn: this.tokenConfig.userAccess.expiresIn,
@@ -106,7 +106,7 @@ export class TokenService {
   verifyUserAccessToken(token: string) {
     return this.verify<{userId: string; iat: number; exp: number}>({
       token,
-      secret: this.tokenConfig.userAccess.secret,
+      secret: this.tokenConfig.userAccess.secret || this.tokenConfig.defaultSecret,
       options: {
         subject: TokenSubject.USER_ACCESS_TOKEN,
       },
@@ -119,7 +119,7 @@ export class TokenService {
   signUserRefreshToken(payload: {userId: string}, options?: {expiresIn: string | number}) {
     return this.sign({
       payload,
-      secret: this.tokenConfig.userRefresh.secret,
+      secret: this.tokenConfig.userRefresh.secret || this.tokenConfig.defaultSecret,
       options: {
         subject: TokenSubject.USER_REFRESH_TOKEN,
         expiresIn: options ? options.expiresIn : this.tokenConfig.userRefresh.expiresIn,
@@ -135,7 +135,7 @@ export class TokenService {
   verifyUserRefreshToken(token: string) {
     return this.verify<{userId: string; iat: number; exp: number}>({
       token,
-      secret: this.tokenConfig.userRefresh.secret,
+      secret: this.tokenConfig.userRefresh.secret || this.tokenConfig.defaultSecret,
       options: {
         subject: TokenSubject.USER_REFRESH_TOKEN,
       },
