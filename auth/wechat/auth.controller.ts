@@ -1,4 +1,4 @@
-import {Controller, Post, Body, Ip, Req, Res} from '@nestjs/common';
+import {Controller, Post, Body, Ip, Req} from '@nestjs/common';
 import {ApiTags} from '@nestjs/swagger';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
 import {GuardByRefreshToken} from '@microservices/account/security/passport/refresh-token/refresh-token.decorator';
@@ -30,10 +30,7 @@ export class WechatLoginController {
   }
 
   @Post('logout')
-  async logout(
-    @Req() req,
-    @Res({passthrough: true}) response: Response
-  ): Promise<{data: {message: string}}> {
+  async logout(@Req() req): Promise<{data: {message: string}}> {
     // [step 1] Get access token.
     const accessToken = this.tokenService.getTokenFromHttpRequest(req);
 
