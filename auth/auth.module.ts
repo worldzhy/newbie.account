@@ -1,7 +1,5 @@
 import {Global, Module} from '@nestjs/common';
-
-import {AuthService} from './auth.service';
-import {WechatAuthService} from './wechat/auth.service';
+import {SecurityModule} from '../security/security.module';
 
 import {LoginByApiKeyController} from './login-by-apikey.controller';
 import {LoginByApprovedSubnetController} from './login-by-approved-subnet.controller';
@@ -13,9 +11,10 @@ import {LogoutController} from './logout.controller';
 import {RefreshAccessTokenController} from './refresh-access-token.controller';
 import {SignupEmailVerifyController} from './signup-email-verify.controller';
 import {SignupController} from './signup.controller';
-import {WechatLoginController} from './wechat/auth.controller';
-import {WechatRefreshAccessTokenController} from './wechat/refresh-access-token.controller';
-import {SecurityModule} from '../security/security.module';
+import {WechatAuthController} from './wechat/auth.controller';
+
+import {AuthService} from './auth.service';
+import {WechatAuthService} from './wechat/auth.service';
 
 @Global()
 @Module({
@@ -31,8 +30,7 @@ import {SecurityModule} from '../security/security.module';
     RefreshAccessTokenController,
     SignupEmailVerifyController,
     SignupController,
-    WechatLoginController,
-    WechatRefreshAccessTokenController,
+    WechatAuthController,
   ],
   providers: [AuthService, WechatAuthService],
   exports: [AuthService, WechatAuthService],

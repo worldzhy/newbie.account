@@ -10,7 +10,7 @@ import {WechatLoginDto} from '@microservices/account/auth/wechat/auth.dto';
 
 @ApiTags('Account / Auth / Wechat')
 @Controller('auth/wechat')
-export class WechatLoginController {
+export class WechatAuthController {
   constructor(
     private readonly tokenService: TokenService,
     private readonly limitLoginByUserService: LimitLoginByUserService,
