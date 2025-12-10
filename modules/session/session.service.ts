@@ -14,9 +14,15 @@ export class SessionService {
     private readonly tokenService: TokenService
   ) {}
 
-  async generate(params: {ipAddress: string; userAgent: string; userId: string}) {
+  async generate(params: {
+    ipAddress: string;
+    userAgent: string;
+    userId: string;
+  }) {
     const ua = new UAParser(params.userAgent);
-    const location = await this.geolocationService.getLocation(params.ipAddress);
+    const location = await this.geolocationService.getLocation(
+      params.ipAddress
+    );
     return await this.prisma.session.create({
       data: {
         accessToken: this.tokenService.signUserAccessToken({
@@ -31,9 +37,13 @@ export class SessionService {
         timezone: location?.location?.time_zone,
         countryCode: location?.country?.iso_code,
         userAgent: params.userAgent,
-        browser: `${ua.getBrowser().name ?? ''} ${ua.getBrowser().version ?? ''}`.trim() || undefined,
+        browser:
+          `${ua.getBrowser().name ?? ''} ${ua.getBrowser().version ?? ''}`.trim() ||
+          undefined,
         operatingSystem:
-          `${ua.getOS().name ?? ''} ${ua.getOS().version ?? ''}`.replace('Mac OS', 'macOS').trim() || undefined,
+          `${ua.getOS().name ?? ''} ${ua.getOS().version ?? ''}`
+            .replace('Mac OS', 'macOS')
+            .trim() || undefined,
         userId: params.userId,
       },
     });
@@ -41,7 +51,8 @@ export class SessionService {
 
   async refresh(refreshToken: string) {
     // [step 1] Validate refresh token
-    const refreshTokenInfo = this.tokenService.verifyUserRefreshToken(refreshToken);
+    const refreshTokenInfo =
+      this.tokenService.verifyUserRefreshToken(refreshToken);
 
     // [step 2] Update tokens.
     return await this.prisma.session.update({
@@ -58,9 +69,9 @@ export class SessionService {
     });
   }
 
-  async destroy(refreshToken: string) {
+  async destroy(token: string) {
     const session = await this.prisma.session.findFirst({
-      where: {refreshToken},
+      where: {OR: [{accessToken: token}, {refreshToken: token}]},
       select: {id: true, user: {select: {id: true}}},
     });
     if (!session) throw new NotFoundException(SESSION_NOT_FOUND);

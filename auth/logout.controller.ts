@@ -1,32 +1,45 @@
-import {Controller, Post, Res, Req} from '@nestjs/common';
+import {Controller, Post, Req, Res} from '@nestjs/common';
 import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response} from 'express';
-import {SessionService} from '@microservices/account/modules/session/session.service';
-import {CookieName, CookieService} from '@microservices/account/security/cookie/cookie.service';
+import {
+  CookieName,
+  CookieService,
+} from '@microservices/account/security/cookie/cookie.service';
+import {TokenService} from '@microservices/account/security/token/token.service';
 import {LimitLoginByUserService} from '@microservices/account/security/rate-limiter/rate-limiter.service';
+import {SessionService} from '@microservices/account/modules/session/session.service';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
 export class LogoutController {
   constructor(
-    private readonly sessionService: SessionService,
     private readonly cookieService: CookieService,
-    private readonly limitLoginByUserService: LimitLoginByUserService
+    private readonly tokenService: TokenService,
+    private readonly limitLoginByUserService: LimitLoginByUserService,
+    private readonly sessionService: SessionService
   ) {}
 
   @Post('logout')
   @ApiBearerAuth()
-  async logout(@Req() req, @Res({passthrough: true}) response: Response): Promise<{data: {message: string}}> {
-    // [step 1] Invalidate all tokens.
-    await this.sessionService.destroy(req.body.id);
+  async logout(
+    @Req() req,
+    @Res({passthrough: true}) response: Response
+  ): Promise<{data: {message: string}}> {
+    // [step 1] Get access token.
+    const accessToken = this.tokenService.getTokenFromHttpRequest(req);
 
-    // [step 2] Clear user attempts.
-    await this.limitLoginByUserService.delete(req.body.id);
+    // [step 2] Delete session and clear user attempts.
+    if (accessToken) {
+      await this.sessionService.destroy(accessToken);
+
+      const {userId} = this.tokenService.verifyUserAccessToken(accessToken);
+      await this.limitLoginByUserService.delete(userId);
+    }
 
     // [step 3] Clear cookie
     this.cookieService.clear(response, CookieName.REFRESH_TOKEN);
 
-    // [step 3] Always return success no matter if the user exists.
+    // [step 4] Always return success no matter if the user exists.
     return {
       data: {message: 'User logs out successfully'},
     };

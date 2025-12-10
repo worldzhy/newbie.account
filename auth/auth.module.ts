@@ -13,7 +13,7 @@ import {LogoutController} from './logout.controller';
 import {RefreshAccessTokenController} from './refresh-access-token.controller';
 import {SignupEmailVerifyController} from './signup-email-verify.controller';
 import {SignupController} from './signup.controller';
-import {WechatLoginController} from './wechat/login.controller';
+import {WechatLoginController} from './wechat/auth.controller';
 import {WechatRefreshAccessTokenController} from './wechat/refresh-access-token.controller';
 import {SecurityModule} from '../security/security.module';
 
