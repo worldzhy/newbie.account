@@ -9,11 +9,11 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import {ApiTags, ApiResponse, ApiBearerAuth} from '@nestjs/swagger';
-import {Prisma, Session} from '@prisma/client';
+import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {Prisma, Session} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {Expose, expose} from '../../helpers/expose';
-import {SessionsListResponseDto, SessionsListRequestDto} from './session.dto';
+import {SessionsListRequestDto, SessionsListResponseDto} from './session.dto';
 import {SESSION_NOT_FOUND, UNAUTHORIZED_RESOURCE} from '@framework/exceptions/errors.constants';
 import {UserRequest} from '../../account.interface';
 

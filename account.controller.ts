@@ -1,7 +1,7 @@
 import {BadRequestException, Body, Controller, Get, Patch, Post, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
-import {Prisma} from '@prisma/client';
+import {Prisma} from '@generated/prisma/client';
 import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {compareHash} from '@framework/utilities/common.util';

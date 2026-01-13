@@ -1,5 +1,5 @@
 import {Injectable} from '@nestjs/common';
-import {Prisma, UserRole} from '@prisma/client';
+import {Prisma, UserRole} from '@generated/prisma/client';
 import {Request} from 'express';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '@microservices/account/security/token/token.service';

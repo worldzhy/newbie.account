@@ -1,6 +1,6 @@
-import {Injectable, CanActivate, ExecutionContext} from '@nestjs/common';
+import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common';
 import {Reflector} from '@nestjs/core';
-import {PermissionAction, Prisma, UserRole} from '@prisma/client';
+import {PermissionAction, Prisma, UserRole} from '@generated/prisma/client';
 import {PERMISSION_KEY} from './authorization.decorator';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '../token/token.service';

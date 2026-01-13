@@ -4,7 +4,7 @@ import {Strategy} from 'passport-local';
 import {compareHash} from '@framework/utilities/common.util';
 import {UserService} from '@microservices/account/modules/user/user.service';
 import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
-import {UserStatus} from '@prisma/client';
+import {UserStatus} from '@generated/prisma/client';
 
 @Injectable()
 export class PasswordStrategy extends PassportStrategy(Strategy, 'local.password') {

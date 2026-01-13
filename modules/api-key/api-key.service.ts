@@ -1,7 +1,6 @@
 import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {Prisma} from '@prisma/client';
-import {ApiKey} from '@prisma/client';
+import {ApiKey, Prisma} from '@generated/prisma/client';
 import {API_KEY_NOT_FOUND, UNAUTHORIZED_RESOURCE} from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {generateRandomString} from '@framework/utilities/random.util';

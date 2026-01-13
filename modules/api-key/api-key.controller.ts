@@ -1,6 +1,6 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
-import {ApiKey, Prisma} from '@prisma/client';
+import {ApiKey, Prisma} from '@generated/prisma/client';
 import {CursorPipe} from '@framework/pipes/cursor.pipe';
 import {OrderByPipe} from '@framework/pipes/order-by.pipe';
 import {WherePipe} from '@framework/pipes/where.pipe';

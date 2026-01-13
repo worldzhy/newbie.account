@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {User, UserGender} from '@prisma/client';
+import {User, UserGender} from '@generated/prisma/client';
 import axios from 'axios';
 import {Response} from 'express';
 import {
@@ -28,8 +28,8 @@ import {CookieService} from '@microservices/account/security/cookie/cookie.servi
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {TokenSubject} from '@microservices/account/security/token/token.constants';
 import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
-import * as anonymize from 'ip-anonymize';
-import * as randomColor from 'randomcolor';
+import anonymize from 'ip-anonymize';
+import randomColor from 'randomcolor';
 
 @Injectable()
 export class AuthService {

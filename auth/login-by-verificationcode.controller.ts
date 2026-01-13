@@ -1,6 +1,6 @@
-import {Controller, Post, Body, Res, NotFoundException, Ip, Headers, Req} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {VerificationCodeUse} from '@prisma/client';
+import {Body, Controller, Headers, Ip, NotFoundException, Post, Req, Res} from '@nestjs/common';
+import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
+import {VerificationCodeUse} from '@generated/prisma/client';
 import {Response} from 'express';
 import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
 import {UserRequest} from '@microservices/account/account.interface';

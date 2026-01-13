@@ -1,8 +1,8 @@
 import {Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
-import type {Prisma} from '@prisma/client';
-import {ApprovedSubnet} from '@prisma/client';
+import type {Prisma} from '@generated/prisma/client';
+import {ApprovedSubnet} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import * as anonymize from 'ip-anonymize';
+import anonymize from 'ip-anonymize';
 import {APPROVED_SUBNET_NOT_FOUND, UNAUTHORIZED_RESOURCE} from '@framework/exceptions/errors.constants';
 import {Expose, expose} from '../../helpers/expose';
 import {GeolocationService} from '../../helpers/geolocation.service';
