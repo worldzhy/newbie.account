@@ -1,6 +1,6 @@
-import {Controller, Delete, Get, Patch, Post, Body, Param, Query, BadRequestException} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
-import {PermissionAction, Prisma, User, UserRole} from '@prisma/client';
+import {BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query} from '@nestjs/common';
+import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
+import {PermissionAction, Prisma, User, UserRole} from '@generated/prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
 import {compareHash} from '@framework/utilities/common.util';
 import {PrismaService} from '@framework/prisma/prisma.service';

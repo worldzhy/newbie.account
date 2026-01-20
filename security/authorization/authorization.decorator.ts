@@ -1,6 +1,6 @@
 import {WhereInput} from '@casl/prisma';
 import {SetMetadata} from '@nestjs/common';
-import {PermissionAction, Prisma} from '@prisma/client';
+import {PermissionAction, Prisma} from '@generated/prisma/client';
 
 export const PERMISSION_KEY = 'permission';
 export const RequirePermission = (

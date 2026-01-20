@@ -5,7 +5,7 @@ import {decode, DecodeOptions, sign, verify} from 'jsonwebtoken';
 import {v4} from 'uuid';
 import {INVALID_TOKEN} from '@framework/exceptions/errors.constants';
 import {TokenSubject} from './token.constants';
-import * as express from 'express';
+import express from 'express';
 
 @Injectable()
 export class TokenService {

@@ -82,29 +82,29 @@
     "WECHAT_APP_SECRET": ""
   },
   "dependencies": {
-    "@aws-sdk/client-pinpoint": "^3.609.0",
-    "@nestjs/passport": "^10.0.2",
-    "@casl/prisma": "^1.5.2",
+    "@aws-sdk/client-pinpoint": "latest",
+    "@nestjs/passport": "latest",
+    "@casl/prisma": "latest",
     "geolite2-redist": "latest",
-    "ioredis": "^5.3.2",
-    "ip-anonymize": "^0.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "lru-cache": "^11.0.2",
+    "ioredis": "latest",
+    "ip-anonymize": "latest",
+    "jsonwebtoken": "latest",
+    "lru-cache": "latest",
     "maxmind": "latest",
-    "passport": "^0.6.0",
-    "passport-custom": "^1.1.1",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-jwt": "^4.0.1",
-    "passport-local": "^1.0.0",
-    "randomcolor": "^0.6.2",
-    "rate-limiter-flexible": "^3.0.4",
+    "passport": "latest",
+    "passport-custom": "latest",
+    "passport-google-oauth20": "latest",
+    "passport-jwt": "latest",
+    "passport-local": "latest",
+    "randomcolor": "latest",
+    "rate-limiter-flexible": "latest",
     "ua-parser-js": "latest",
-    "validator": "^13.11.0"
+    "validator": "latest"
   },
   "devDependencies": {
-    "@types/passport-google-oauth20": "^2.0.16",
-    "@types/passport-jwt": "^3.0.13",
-    "@types/passport-local": "^1.0.38",
-    "@types/validator": "^13.11.7"
+    "@types/passport-google-oauth20": "latest",
+    "@types/passport-jwt": "latest",
+    "@types/passport-local": "latest",
+    "@types/validator": "latest"
   }
 }

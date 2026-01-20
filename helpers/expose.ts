@@ -1,4 +1,4 @@
-import {Session, User} from '@prisma/client';
+import {Session, User} from '@generated/prisma/client';
 
 /** Delete sensitive keys from an object */
 export function expose<T>(item: T): Expose<T> {

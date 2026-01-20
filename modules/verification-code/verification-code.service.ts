@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {VerificationCode, VerificationCodeStatus, VerificationCodeUse} from '@prisma/client';
+import {VerificationCode, VerificationCodeStatus, VerificationCodeUse} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {currentPlusMinutes} from '@framework/utilities/datetime.util';
 import {generateRandomNumbers} from '@framework/utilities/common.util';
