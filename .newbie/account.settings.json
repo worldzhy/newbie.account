@@ -55,6 +55,9 @@
       "wechat": {
         "appId": "process.env.WECHAT_APP_ID || 'your-app-id'",
         "appSecret": "process.env.WECHAT_APP_SECRET || 'your-app-secret'"
+      },
+      "security": {
+        "defaultGuard": "process.env.ACCOUNT_DEFAULT_GUARD || 'jwt'"
       }
     }
   },
@@ -65,6 +68,7 @@
     "ACCOUNT_USER_ACCESS_TOKEN_SECRET": "",
     "ACCOUNT_USER_REFRESH_TOKEN_SECRET": "",
     "ACCOUNT_APIKEY_ACCESS_TOKEN_SECRET": "",
+    "ACCOUNT_DEFAULT_GUARD": "",
     "CACHE_GEOLOCATION_LRU_SIZE": "",
     "CACHE_APIKEY_LRU_SIZE": "",
     "TRACKING_MODE": "",

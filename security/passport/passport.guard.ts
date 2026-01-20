@@ -1,4 +1,5 @@
 import {Injectable, ExecutionContext} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
 import {Reflector} from '@nestjs/core';
 import {AuthGuard} from '@nestjs/passport';
 import {NoAuthGuard} from './public/public.guard';
@@ -18,10 +19,14 @@ import {IS_LOGGING_IN_VERIFICATION_CODE_KEY} from './verification-code/verificat
 import {IS_REFRESHING_ACCESS_TOKEN_KEY} from './refresh-token/refresh-token.decorator';
 import {IS_LOGGING_IN_APIKEY_KEY} from './api-key/api-key.decorator';
 import {IS_LOGGING_IN_GOOGLE_KEY} from './google-oauth/google.decorator';
+import {RouteAuthenticationService} from '../route-authentication/route-authentication.service';
+import {GuardType} from './guard.types';
 
 @Injectable()
 export class PassportGuard extends AuthGuard('authentication') {
   constructor(
+    private readonly config: ConfigService,
+    private readonly routeAuthenticationService: RouteAuthenticationService,
     private reflector: Reflector,
     private noAuthGuard: NoAuthGuard,
     private passwordAuthGuard: PasswordAuthGuard,
@@ -37,6 +42,12 @@ export class PassportGuard extends AuthGuard('authentication') {
   }
 
   canActivate(context: ExecutionContext) {
+    const req = context.switchToHttp().getRequest();
+    // ! Skip authentication for configured public routes
+    if (this.routeAuthenticationService.isPublic(req.url, req.method)) {
+      return true;
+    }
+
     // Use @NoGuard() for non-authentication
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
@@ -110,6 +121,30 @@ export class PassportGuard extends AuthGuard('authentication') {
     }
 
     // JWT guard is the default guard.
-    return this.jwtAuthGuard.canActivate(context);
+    const defaultGuard =
+      (this.config.get<string>('microservices.account.security.defaultGuard') as GuardType) ||
+      GuardType.JWT;
+
+    switch (defaultGuard) {
+      case GuardType.NONE:
+        return this.noAuthGuard.canActivate(context);
+      case GuardType.PASSWORD:
+        return this.passwordAuthGuard.canActivate(context);
+      case GuardType.API_KEY:
+        return this.apiKeyAuthGuard.canActivate(context);
+      case GuardType.PROFILE:
+        return this.profileAuthGuard.canActivate(context);
+      case GuardType.UUID:
+        return this.uuidAuthGuard.canActivate(context);
+      case GuardType.VERIFICATION_CODE:
+        return this.verificationCodeAuthGuard.canActivate(context);
+      case GuardType.REFRESH_TOKEN:
+        return this.refreshTokenAuthGuard.canActivate(context);
+      case GuardType.GOOGLE:
+        return this.googleAuthGuard.canActivate(context);
+      case GuardType.JWT:
+      default:
+        return this.jwtAuthGuard.canActivate(context);
+    }
   }
 }

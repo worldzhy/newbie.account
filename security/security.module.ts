@@ -32,13 +32,18 @@ import {
   LimitLoginByIpService,
   LimitLoginByUserService,
 } from './rate-limiter/rate-limiter.service';
+import {RouteAuthenticationService} from './route-authentication/route-authentication.service';
+
+import {RouteAuthenticationGuard} from './route-authentication/route-authentication.guard';
 
 @Module({
   imports: [CookieModule, TokenModule],
   providers: [
+    RouteAuthenticationService,
     {provide: APP_GUARD, useClass: RateLimiterGuard}, // 1nd priority guard.
     {provide: APP_GUARD, useClass: PassportGuard}, // 2rd priority guard.
-    {provide: APP_GUARD, useClass: AuthorizationGuard}, // 3th priority guard.
+    {provide: APP_GUARD, useClass: RouteAuthenticationGuard}, // 3th priority guard (Specific Route Auth)
+    {provide: APP_GUARD, useClass: AuthorizationGuard}, // 4th priority guard.
     NoAuthGuard,
     ApiKeyAuthGuard,
     GoogleAuthGuard,
@@ -63,6 +68,11 @@ import {
     LimitLoginByIpService,
     LimitLoginByUserService,
   ],
-  exports: [LimitAccessByIpService, LimitLoginByIpService, LimitLoginByUserService],
+  exports: [
+    LimitAccessByIpService,
+    LimitLoginByIpService,
+    LimitLoginByUserService,
+    RouteAuthenticationService,
+  ],
 })
 export class SecurityModule {}
