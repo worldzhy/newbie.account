@@ -30,6 +30,6 @@ import {VerificationCodeModule} from './modules/verification-code/verification-c
   ],
   controllers: [AccountController],
   providers: [AccountService, GeolocationService],
-  exports: [AccountService, GeolocationService],
+  exports: [AccountService, GeolocationService, SecurityModule],
 })
 export class AccountModule {}
