@@ -35,6 +35,7 @@ export class GeolocationService implements OnModuleDestroy {
       }
       return this.reader.get(ipAddress) ?? {};
     } catch (error) {
+      console.error(error);
       return {};
     }
   }

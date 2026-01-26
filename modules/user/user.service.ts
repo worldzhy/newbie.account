@@ -2,11 +2,12 @@ import {Injectable} from '@nestjs/common';
 import {User} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {verifyEmail, verifyPhone} from '@microservices/account/helpers/validator';
+import {userPrismaExtension} from './user.prisma.extension';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {
-    // this.prisma.$use(userPrismaMiddleware);
+    this.prisma.registerExtension(userPrismaExtension);
   }
 
   /**
