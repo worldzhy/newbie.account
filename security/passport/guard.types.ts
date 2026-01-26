@@ -1,11 +1,11 @@
 export enum GuardType {
   JWT = 'jwt',
-  NONE = 'custom.no-auth',
   PASSWORD = 'local.password',
+  VERIFICATION_CODE = 'local.verification-code',
+  NONE = 'custom.no-auth',
   API_KEY = 'custom.api-key',
   PROFILE = 'custom.user-profile',
   UUID = 'custom.uuid',
-  VERIFICATION_CODE = 'local.verification-code',
   REFRESH_TOKEN = 'custom.refresh-token',
   GOOGLE = 'google',
 }

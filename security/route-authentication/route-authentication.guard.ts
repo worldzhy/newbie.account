@@ -1,4 +1,4 @@
-import {Injectable, ExecutionContext, Inject} from '@nestjs/common';
+import {Injectable, ExecutionContext} from '@nestjs/common';
 import {RouteAuthenticationService} from './route-authentication.service';
 import {GuardType} from '../passport/guard.types';
 import {ApiKeyAuthGuard} from '../passport/api-key/api-key.guard';
@@ -26,10 +26,7 @@ export class RouteAuthenticationGuard {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
-    const guardType = this.routeAuthenticationService.getGuardForRoute(
-      req.url,
-      req.method
-    );
+    const guardType = this.routeAuthenticationService.getGuardForRoute(req.url, req.method);
 
     if (!guardType) {
       return true;
