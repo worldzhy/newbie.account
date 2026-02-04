@@ -7,6 +7,7 @@ import {TokenModule} from './token/token.module';
 import {RateLimiterGuard} from './rate-limiter/rate-limiter.guard';
 import {PassportGuard} from './passport/passport.guard';
 import {AuthorizationGuard} from './authorization/authorization.guard';
+import {RouteAuthorizationService} from './route-authorization/route-authorization.service';
 import {NoAuthGuard} from './passport/public/public.guard';
 import {ApiKeyAuthGuard} from './passport/api-key/api-key.guard';
 import {GoogleAuthGuard} from './passport/google-oauth/google.guard';
@@ -35,15 +36,18 @@ import {
 import {RouteAuthenticationService} from './route-authentication/route-authentication.service';
 
 import {RouteAuthenticationGuard} from './route-authentication/route-authentication.guard';
+import {RouteAuthorizationGuard} from './route-authorization/route-authorization.guard';
 
 @Module({
   imports: [CookieModule, TokenModule],
   providers: [
     RouteAuthenticationService,
+    RouteAuthorizationService,
     {provide: APP_GUARD, useClass: RateLimiterGuard}, // 1nd priority guard.
     {provide: APP_GUARD, useClass: PassportGuard}, // 2rd priority guard.
     {provide: APP_GUARD, useClass: RouteAuthenticationGuard}, // 3th priority guard (Specific Route Auth)
     {provide: APP_GUARD, useClass: AuthorizationGuard}, // 4th priority guard.
+    {provide: APP_GUARD, useClass: RouteAuthorizationGuard}, // 5th priority guard (Specific Route Authorization)
     NoAuthGuard,
     ApiKeyAuthGuard,
     GoogleAuthGuard,
@@ -73,6 +77,7 @@ import {RouteAuthenticationGuard} from './route-authentication/route-authenticat
     LimitLoginByIpService,
     LimitLoginByUserService,
     RouteAuthenticationService,
+    RouteAuthorizationService,
   ],
 })
 export class SecurityModule {}

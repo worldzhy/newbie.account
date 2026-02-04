@@ -144,6 +144,33 @@ export class ApiKeyService {
     return expose<ApiKey>(apiKey);
   }
 
+  async updateApiKeyForOrganization(organizationId: string, id: number, data: Prisma.ApiKeyUpdateInput): Promise<Expose<ApiKey>> {
+    const testApiKey = await this.prisma.apiKey.findUnique({
+      where: {id},
+    });
+    if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
+    if (testApiKey.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    const apiKey = await this.prisma.apiKey.update({
+      where: {id},
+      data,
+    });
+    this.lru.delete(testApiKey.key);
+    return expose<ApiKey>(apiKey);
+  }
+
+  async deleteApiKeyForOrganization(organizationId: string, id: number): Promise<Expose<ApiKey>> {
+    const testApiKey = await this.prisma.apiKey.findUnique({
+      where: {id},
+    });
+    if (!testApiKey) throw new NotFoundException(API_KEY_NOT_FOUND);
+    if (testApiKey.organizationId !== organizationId) throw new UnauthorizedException(UNAUTHORIZED_RESOURCE);
+    const apiKey = await this.prisma.apiKey.delete({
+      where: {id},
+    });
+    this.lru.delete(testApiKey.key);
+    return expose<ApiKey>(apiKey);
+  }
+
   async getApiKeyLogsForOrganization(
     organizationId: string,
     id: number,
