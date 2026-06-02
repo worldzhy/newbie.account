@@ -1,10 +1,12 @@
-import {BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query} from '@nestjs/common';
+import {BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
 import {PermissionAction, Prisma, User, UserRole} from '@generated/prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
 import {compareHash} from '@framework/utilities/common.util';
 import {PrismaService} from '@framework/prisma/prisma.service';
+import {TokenService} from '@microservices/account/security/token/token.service';
 import {UserService} from './user.service';
+import {Request} from 'express';
 
 @ApiTags('Account / User')
 @ApiBearerAuth()
@@ -12,13 +14,15 @@ import {UserService} from './user.service';
 export class UserController {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
   ) {}
 
   @Post('')
   @RequirePermission(PermissionAction.Create, Prisma.ModelName.User)
   async createUser(@Body() body: Prisma.UserCreateInput) {
-    return await this.prisma.user.create({
+    // [step 1] Create the user.
+    const user = await this.prisma.user.create({
       data: body,
       select: {
         id: true,
@@ -31,6 +35,28 @@ export class UserController {
         lastName: true,
       },
     });
+
+    // [step 2] Automatically create Permission records for the new user so that
+    // they can pass the @RequirePermission checks on User resource endpoints.
+    // A Manage-level permission on a resource matches any action (Create, List,
+    // Get, Update, Delete), giving the user full access to their own resource.
+    //
+    // The ADMIN role already bypasses all permission checks in AuthorizationGuard,
+    // so these records are primarily useful for non-ADMIN (USER role) users.
+
+    const permissionData: Prisma.PermissionCreateInput[] = [
+      {
+        action: PermissionAction.Manage,
+        resource: Prisma.ModelName.User,
+        trustedUserId: user.id,
+      },
+    ];
+
+    for (const p of permissionData) {
+      await this.prisma.permission.create({data: p});
+    }
+
+    return user;
   }
 
   @Get('')
@@ -107,18 +133,33 @@ export class UserController {
     },
   })
   async updateUser(@Param('userId') userId: string, @Body() body: Prisma.UserUpdateInput) {
-    return await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: {id: userId},
       data: body,
     });
+
+    // Strip the password hash from the response to prevent sensitive data leakage.
+    return this.userService.withoutPassword(user);
   }
 
   @Delete(':userId')
   @RequirePermission(PermissionAction.Delete, Prisma.ModelName.User)
-  async deleteUser(@Param('userId') userId: string): Promise<User> {
-    return await this.prisma.user.delete({
+  async deleteUser(@Param('userId') userId: string, @Req() req: Request): Promise<Omit<User, 'password'>> {
+    // Prevent users from deleting their own account.
+    const token = this.tokenService.getTokenFromHttpRequest(req);
+    if (token) {
+      const payload = this.tokenService.verifyUserAccessToken(token);
+      if (payload.userId === userId) {
+        throw new BadRequestException('You cannot delete your own account.');
+      }
+    }
+
+    const user = await this.prisma.user.delete({
       where: {id: userId},
     });
+
+    // Strip the password hash from the response.
+    return this.userService.withoutPassword(user);
   }
 
   @Patch(':userId/change-password')

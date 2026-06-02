@@ -1,16 +1,36 @@
-import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Headers,
+  Ip,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiTags,
+} from '@nestjs/swagger';
 import {Response} from 'express';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {GuardByPassword} from '@microservices/account/security/passport/password/password.decorator';
 import {UserRequest} from '@microservices/account/account.interface';
-import {LimitLoginByIp, LimitLoginByUser} from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
-import {LoginByPasswordRequestDto, LoginByPasswordResponseDto} from '@microservices/account/auth/auth.dto';
+import {
+  LimitLoginByIp,
+  LimitLoginByUser,
+} from '@microservices/account/security/rate-limiter/rate-limiter.decorator';
+import {
+  LoginByPasswordRequestDto,
+  LoginByPasswordResponseDto,
+} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
 export class LoginByPasswordController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+  ) {
+  }
 
   /**
    * After a user is verified by auth guard, this 'login' function returns
@@ -31,14 +51,17 @@ export class LoginByPasswordController {
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,
     @Req() request: UserRequest,
-    @Res({passthrough: true}) response: Response
+    @Res({passthrough: true}) response: Response,
   ): Promise<LoginByPasswordResponseDto> {
-    return await this.authService.login({
+    const loginResult = await this.authService.login({
       ipAddress,
       userAgent,
       userId: request.user.userId,
       response,
+      skipEmailCheck: body.skipEmailCheck,
     });
+
+    return loginResult;
   }
 
   /* End */
