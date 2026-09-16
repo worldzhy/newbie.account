@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import {Response} from 'express';
@@ -46,6 +48,8 @@ export class LoginByPasswordController {
   @LimitLoginByUser()
   @GuardByPassword()
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Login with account and password'})
+  @ApiResponse({type: LoginByPasswordResponseDto})
   async loginByPassword(
     @Body() body: LoginByPasswordRequestDto, // Is it required for guard?
     @Ip() ipAddress: string,

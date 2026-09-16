@@ -1,5 +1,5 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req} from '@nestjs/common';
-import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {ApiKey, Prisma} from '@generated/prisma/client';
 import {CursorPipe} from '@framework/pipes/cursor.pipe';
 import {OrderByPipe} from '@framework/pipes/order-by.pipe';
@@ -7,7 +7,7 @@ import {WherePipe} from '@framework/pipes/where.pipe';
 import {Expose} from '../../helpers/expose';
 import {AuditLog} from '../audit-logs/audit-log.decorator';
 import {GuardByApiKey} from '../../security/passport/api-key/api-key.decorator';
-import {CreateApiKeyDto, ReplaceApiKeyDto, UpdateApiKeyDto} from './api-key.dto';
+import {ApiKeyResponseDto, CreateApiKeyDto, ReplaceApiKeyDto, UpdateApiKeyDto} from './api-key.dto';
 import {ApiKeyService} from './api-key.service';
 
 @ApiTags('Account / Api Key')
@@ -19,6 +19,8 @@ export class ApiKeyController {
   /** Create an API key for a team */
   @Post()
   @AuditLog('create-api-key')
+  @ApiOperation({summary: 'Create an API key for a user'})
+  @ApiResponse({type: ApiKeyResponseDto})
   async create(@Param('userId') userId: string, @Body() data: CreateApiKeyDto): Promise<Expose<ApiKey>> {
     return await this.apiKeyService.createApiKey({userId, data});
   }
@@ -26,6 +28,8 @@ export class ApiKeyController {
   /** Get API keys for a user */
   @Get()
   @GuardByApiKey()
+  @ApiOperation({summary: 'Get API keys for a user'})
+  @ApiResponse({type: ApiKeyResponseDto, isArray: true})
   async getAll(
     @Req() request: any,
     @Param('userId') userId: string,
@@ -46,6 +50,8 @@ export class ApiKeyController {
 
   /** Get an API key */
   @Get(':id')
+  @ApiOperation({summary: 'Get an API key by id'})
+  @ApiResponse({type: ApiKeyResponseDto})
   async get(@Param('userId') userId: string, @Param('id') id: number): Promise<Expose<ApiKey>> {
     return await this.apiKeyService.getApiKeyForUser(userId, id);
   }
@@ -53,6 +59,8 @@ export class ApiKeyController {
   /** Update an API key */
   @Patch(':id')
   @AuditLog('update-api-key')
+  @ApiOperation({summary: 'Update an API key'})
+  @ApiResponse({type: ApiKeyResponseDto})
   async update(
     @Body() data: UpdateApiKeyDto,
     @Param('userId') userId: string,
@@ -64,6 +72,8 @@ export class ApiKeyController {
   /** Replace an API key */
   @Put(':id')
   @AuditLog('update-api-key')
+  @ApiOperation({summary: 'Replace an API key'})
+  @ApiResponse({type: ApiKeyResponseDto})
   async replace(
     @Body() data: ReplaceApiKeyDto,
     @Param('userId') userId: string,
@@ -75,12 +85,16 @@ export class ApiKeyController {
   /** Delete an API key */
   @Delete(':id')
   @AuditLog('delete-api-key')
+  @ApiOperation({summary: 'Delete an API key'})
+  @ApiResponse({type: ApiKeyResponseDto})
   async remove(@Param('userId') userId: string, @Param('id') id: number): Promise<Expose<ApiKey>> {
     return await this.apiKeyService.deleteApiKey(userId, id);
   }
 
   /** Get logs for an API key */
   @Get(':id/logs')
+  @ApiOperation({summary: 'Get logs for an API key'})
+  @ApiResponse({type: Object, isArray: true})
   async getLogs(
     @Param('userId') userId: string,
     @Param('id') id: number,

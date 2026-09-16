@@ -1,20 +1,21 @@
 import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
-import {CommonListRequestDto, CommonListResponseDto} from '@framework/common.dto';
-
-export class SessionsListRequestDto extends CommonListRequestDto {}
+import {CommonListResponseDto} from '@framework/common.dto';
 
 /**
- * Response DTO for a single Session record (refreshToken stripped by expose()).
+ * Response DTO for a single AuditLog record.
  */
-export class SessionResponseDto {
+export class AuditLogResponseDto {
   @ApiProperty({type: Number})
   id: number;
 
   @ApiProperty({type: String})
-  accessToken: string;
+  event: string;
 
   @ApiProperty({type: String})
-  ipAddress: string;
+  rawEvent: string;
+
+  @ApiPropertyOptional({type: String})
+  ipAddress?: string | null;
 
   @ApiPropertyOptional({type: String})
   userAgent?: string | null;
@@ -43,20 +44,20 @@ export class SessionResponseDto {
   @ApiProperty({type: Date})
   updatedAt: Date;
 
-  @ApiProperty({type: String})
-  userId: string;
+  @ApiPropertyOptional({type: String})
+  userId?: string | null;
 
-  @ApiPropertyOptional({type: Boolean})
-  isCurrentSession?: boolean;
+  @ApiPropertyOptional({type: Number})
+  apiKeyId?: number | null;
+
+  @ApiPropertyOptional({type: String})
+  organizationId?: string | null;
 }
 
 /**
- * Paginated list response for sessions.
+ * Paginated list response for audit logs.
  */
-export class SessionsListResponseDto extends CommonListResponseDto {
-  @ApiProperty({
-    type: SessionResponseDto,
-    isArray: true,
-  })
-  declare records: SessionResponseDto[];
+export class AuditLogListResponseDto extends CommonListResponseDto {
+  @ApiProperty({type: AuditLogResponseDto, isArray: true})
+  declare records: AuditLogResponseDto[];
 }

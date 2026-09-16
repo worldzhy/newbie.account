@@ -1,29 +1,13 @@
 import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
-import {UserRole, UserStatus, UserGender, MfaMethod} from '@generated/prisma/client';
-import {IsString} from 'class-validator';
-
-export class WechatLoginDto {
-  @ApiProperty({type: String, required: true})
-  @IsString()
-  openId: string;
-
-  @ApiProperty({type: String, required: true})
-  @IsString()
-  phone: string;
-}
-
-export class WechatCodeLoginDto {
-  /**
-   * 微信登录临时凭证
-   */
-  @IsString()
-  code: string;
-}
+import {MfaMethod, UserGender, UserRole, UserStatus} from '@generated/prisma/client';
+import {CommonListResponseDto} from '@framework/common.dto';
 
 /**
- * User response DTO used in WeChat login response (sensitive fields stripped).
+ * Response DTO for User (password stripped by service.withoutPassword).
+ * Sensitive fields (twoFactorSecret, wechatSessionKey) are intentionally omitted
+ * from the response schema.
  */
-export class WechatUserResponseDto {
+export class UserResponseDto {
   @ApiProperty({type: String})
   id: string;
 
@@ -92,39 +76,55 @@ export class WechatUserResponseDto {
 
   @ApiPropertyOptional({type: String})
   wechatUnionId?: string | null;
-
-  @ApiProperty({type: Boolean})
-  hasPassword: boolean;
 }
 
 /**
- * Response DTO for WeChat login.
- * Returns access token, refresh token, token expiry and the authenticated user.
+ * Response DTO for user creation (only selected fields returned).
  */
-export class WechatLoginResponseDto {
+export class CreateUserResponseDto {
   @ApiProperty({type: String})
-  token: string;
+  id: string;
 
-  @ApiProperty({type: Number})
-  tokenExpiresInSeconds: number;
+  @ApiPropertyOptional({type: String})
+  email?: string | null;
 
-  @ApiProperty({type: String})
-  refreshToken: string;
+  @ApiPropertyOptional({type: String})
+  phone?: string | null;
 
-  @ApiProperty({type: WechatUserResponseDto})
-  user: WechatUserResponseDto;
+  @ApiProperty({enum: UserStatus})
+  status: UserStatus;
+
+  @ApiPropertyOptional({type: String})
+  name?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  firstName?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  middleName?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  lastName?: string | null;
 }
 
 /**
- * Response DTO for WeChat refresh access token.
+ * Response DTO for password change (only identity fields returned).
  */
-export class WechatRefreshAccessTokenResponseDto {
+export class UserChangePasswordResponseDto {
   @ApiProperty({type: String})
-  token: string;
+  id: string;
 
-  @ApiProperty({type: Number})
-  tokenExpiresInSeconds: number;
+  @ApiPropertyOptional({type: String})
+  email?: string | null;
 
-  @ApiProperty({type: String})
-  refreshToken: string;
+  @ApiPropertyOptional({type: String})
+  phone?: string | null;
+}
+
+/**
+ * Paginated list response for users.
+ */
+export class UserListResponseDto extends CommonListResponseDto {
+  @ApiProperty({type: UserResponseDto, isArray: true})
+  declare records: UserResponseDto[];
 }

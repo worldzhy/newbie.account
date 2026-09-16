@@ -1,11 +1,12 @@
 import {BadRequestException, Body, Controller, Delete, Get, Param, Patch, Post, Query, Req} from '@nestjs/common';
-import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {PermissionAction, Prisma, User, UserRole} from '@generated/prisma/client';
 import {RequirePermission} from '@microservices/account/security/authorization/authorization.decorator';
 import {compareHash} from '@framework/utilities/common.util';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {UserService} from './user.service';
+import {CreateUserResponseDto, UserChangePasswordResponseDto, UserListResponseDto, UserResponseDto} from './user.dto';
 import {Request} from 'express';
 
 @ApiTags('Account / User')
@@ -15,11 +16,13 @@ export class UserController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
-    private readonly tokenService: TokenService,
+    private readonly tokenService: TokenService
   ) {}
 
   @Post('')
   @RequirePermission(PermissionAction.Create, Prisma.ModelName.User)
+  @ApiOperation({summary: 'Create a new user'})
+  @ApiResponse({type: CreateUserResponseDto})
   async createUser(@Body() body: Prisma.UserCreateInput) {
     // [step 1] Create the user.
     const user = await this.prisma.user.create({
@@ -61,6 +64,8 @@ export class UserController {
 
   @Get('')
   @RequirePermission(PermissionAction.List, Prisma.ModelName.User)
+  @ApiOperation({summary: 'Get users with pagination and filters'})
+  @ApiResponse({type: UserListResponseDto})
   async getUsers(
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
@@ -107,6 +112,8 @@ export class UserController {
 
   @Get(':userId')
   @RequirePermission(PermissionAction.Get, Prisma.ModelName.User)
+  @ApiOperation({summary: 'Get a user by id'})
+  @ApiResponse({type: UserResponseDto})
   async getUser(@Param('userId') userId: string) {
     const user = await this.prisma.user.findUniqueOrThrow({
       where: {id: userId},
@@ -117,6 +124,8 @@ export class UserController {
 
   @Patch(':userId')
   @RequirePermission(PermissionAction.Update, Prisma.ModelName.User)
+  @ApiOperation({summary: 'Update a user'})
+  @ApiResponse({type: UserResponseDto})
   @ApiBody({
     description: 'Set roleIds with an empty array to remove all the roles of the user.',
     examples: {
@@ -144,6 +153,8 @@ export class UserController {
 
   @Delete(':userId')
   @RequirePermission(PermissionAction.Delete, Prisma.ModelName.User)
+  @ApiOperation({summary: 'Delete a user'})
+  @ApiResponse({type: UserResponseDto})
   async deleteUser(@Param('userId') userId: string, @Req() req: Request): Promise<Omit<User, 'password'>> {
     // Prevent users from deleting their own account.
     const token = this.tokenService.getTokenFromHttpRequest(req);
@@ -164,6 +175,8 @@ export class UserController {
 
   @Patch(':userId/change-password')
   @RequirePermission(PermissionAction.Update, Prisma.ModelName.User)
+  @ApiOperation({summary: "Change a user's password"})
+  @ApiResponse({type: UserChangePasswordResponseDto})
   @ApiBody({
     description: "The 'userId', 'currentPassword' and 'newPassword' are required in request body.",
     examples: {

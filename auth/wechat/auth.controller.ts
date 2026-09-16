@@ -1,12 +1,17 @@
 import {Controller, Post, Body, Ip, Req} from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
 import {GuardByRefreshToken} from '@microservices/account/security/passport/refresh-token/refresh-token.decorator';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {LimitLoginByUserService} from '@microservices/account/security/rate-limiter/rate-limiter.service';
 import {SessionService} from '@microservices/account/modules/session/session.service';
 import {WechatAuthService} from '@microservices/account/auth/wechat/auth.service';
-import {WechatLoginDto} from '@microservices/account/auth/wechat/auth.dto';
+import {
+  WechatLoginDto,
+  WechatLoginResponseDto,
+  WechatRefreshAccessTokenResponseDto,
+} from '@microservices/account/auth/wechat/auth.dto';
+import {LogoutResponseDto} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth / Wechat')
 @Controller('auth/wechat')
@@ -20,6 +25,8 @@ export class WechatAuthController {
 
   @NoGuard()
   @Post('login')
+  @ApiOperation({summary: 'WeChat mini-program login'})
+  @ApiResponse({type: WechatLoginResponseDto})
   async login(@Ip() ipAddress: string, @Body() body: WechatLoginDto) {
     return await this.wechatAuthService.login({
       ipAddress,
@@ -30,6 +37,8 @@ export class WechatAuthController {
   }
 
   @Post('logout')
+  @ApiOperation({summary: 'WeChat logout'})
+  @ApiResponse({type: LogoutResponseDto})
   async logout(@Req() req): Promise<{data: {message: string}}> {
     // [step 1] Get access token.
     const accessToken = this.tokenService.getTokenFromHttpRequest(req);
@@ -50,6 +59,8 @@ export class WechatAuthController {
 
   @GuardByRefreshToken()
   @Post('refresh-access-token')
+  @ApiOperation({summary: 'WeChat refresh access token'})
+  @ApiResponse({type: WechatRefreshAccessTokenResponseDto})
   async refresh(@Body() body: {refreshToken: string}) {
     return await this.wechatAuthService.refreshAccessToken({
       refreshToken: body.refreshToken,

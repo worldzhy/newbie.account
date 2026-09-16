@@ -1,5 +1,5 @@
 import {Body, Controller, Headers, Ip, NotFoundException, Post, Req, Res} from '@nestjs/common';
-import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {VerificationCodeUse} from '@generated/prisma/client';
 import {Response} from 'express';
 import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
@@ -12,6 +12,7 @@ import {UserService} from '@microservices/account/modules/user/user.service';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
 import {AwsSmsService} from '@microservices/aws-sms/aws-sms.service';
+import {LoginByPasswordResponseDto, SendVerificationCodeResponseDto} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -29,6 +30,8 @@ export class LoginByVerificationCodeController {
   // *
   @NoGuard()
   @Post('send-verification-code')
+  @ApiOperation({summary: 'Send verification code to email or phone'})
+  @ApiResponse({type: SendVerificationCodeResponseDto})
   @ApiBody({
     description: '',
     examples: {
@@ -114,6 +117,8 @@ export class LoginByVerificationCodeController {
   @GuardByVerificationCode()
   @Post('login-by-verification-code')
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Login with verification code'})
+  @ApiResponse({type: LoginByPasswordResponseDto})
   @ApiBody({
     description:
       "The request body must contain 'account' and 'verificationCode' attributes. The 'account' accepts email or phone.",

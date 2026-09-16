@@ -1,5 +1,5 @@
 import {Controller, Post, Req, Res} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth} from '@nestjs/swagger';
+import {ApiOperation, ApiResponse, ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response} from 'express';
 import {
   CookieName,
@@ -8,6 +8,7 @@ import {
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {LimitLoginByUserService} from '@microservices/account/security/rate-limiter/rate-limiter.service';
 import {SessionService} from '@microservices/account/modules/session/session.service';
+import {LogoutResponseDto} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -21,6 +22,8 @@ export class LogoutController {
 
   @Post('logout')
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Logout the current user'})
+  @ApiResponse({type: LogoutResponseDto})
   async logout(
     @Req() req,
     @Res({passthrough: true}) response: Response

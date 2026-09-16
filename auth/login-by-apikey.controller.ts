@@ -1,5 +1,5 @@
 import {Controller, Post, Body} from '@nestjs/common';
-import {ApiTags, ApiBody} from '@nestjs/swagger';
+import {ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {GuardByApiKey} from '@microservices/account/security/passport/api-key/api-key.decorator';
 import {TokenService} from '@microservices/account/security/token/token.service';
 
@@ -19,6 +19,8 @@ export class LoginByApiKeyController {
    */
   @Post('login-by-apikey')
   @GuardByApiKey()
+  @ApiOperation({summary: 'Login with API key and secret'})
+  @ApiResponse({type: String})
   @ApiBody({
     description: "The request body should contain 'key' and 'secret' attributes.",
     examples: {

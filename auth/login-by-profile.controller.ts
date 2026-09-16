@@ -1,10 +1,11 @@
 import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
-import {ApiTags, ApiBearerAuth, ApiBody} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Response} from 'express';
 import {UserRequest} from '@microservices/account/account.interface';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {GuardByProfile} from '@microservices/account/security/passport/profile/profile.decorator';
 import {GuardByUuid} from '@microservices/account/security/passport/uuid/uuid.decorator';
+import {LoginByPasswordResponseDto} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -18,6 +19,8 @@ export class LoginByProfileController {
   @Post('login-by-profile')
   @GuardByProfile()
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Login with user profile information'})
+  @ApiResponse({type: LoginByPasswordResponseDto})
   @ApiBody({
     description:
       "The request body should contain 'firstName', 'middleName', 'lastName' and 'dateOfBirth' attributes. The 'suffix' is optional.",
@@ -68,6 +71,8 @@ export class LoginByProfileController {
   @Post('login-by-uuid')
   @GuardByUuid()
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Login with UUID'})
+  @ApiResponse({type: LoginByPasswordResponseDto})
   @ApiBody({
     description: 'Verfiy account by uuid.',
     examples: {

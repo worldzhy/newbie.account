@@ -9,7 +9,11 @@ import {AccountService} from '@microservices/account/account.service';
 import {verifyEmail, verifyPhone} from '@microservices/account/helpers/validator';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
-import {ChangePasswordDto, GetCurrentUserResponseDto} from '@microservices/account/account.dto';
+import {
+  ChangePasswordDto,
+  GetCurrentUserResponseDto,
+  PasswordChangeResponseDto,
+} from '@microservices/account/account.dto';
 
 @ApiTags('Account')
 @Controller('account')
@@ -30,12 +34,16 @@ export class AccountController {
 
   @Patch('me')
   @ApiBearerAuth()
+  @ApiOperation({summary: 'Update current user information'})
+  @ApiResponse({type: GetCurrentUserResponseDto})
   async updateCurrentUser(@Req() request: Request, @Body() body: Prisma.UserUpdateInput) {
     return await this.accountService.updateMe(request, body);
   }
 
   @ApiBearerAuth()
   @Post('change-password')
+  @ApiOperation({summary: 'Change the password of the current user'})
+  @ApiResponse({type: PasswordChangeResponseDto})
   async changePassword(@Body() body: ChangePasswordDto) {
     // [step 1] Guard statement.
     if (!('currentPassword' in body) || !('newPassword' in body)) {
@@ -66,6 +74,8 @@ export class AccountController {
 
   @NoGuard()
   @Post('reset-password')
+  @ApiOperation({summary: 'Reset password with email or phone verification code'})
+  @ApiResponse({type: PasswordChangeResponseDto})
   @ApiBody({
     description: '',
     examples: {

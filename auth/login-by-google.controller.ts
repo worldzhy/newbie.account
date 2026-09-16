@@ -1,6 +1,7 @@
 import {Controller, Get, NotFoundException, Req} from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {GuardByGoogle} from '@microservices/account/security/passport/google-oauth/google.decorator';
+import {GoogleOAuthRedirectResponseDto} from '@microservices/account/auth/auth.dto';
 
 /**
  * local dev, to change file node_modules/oauth/lib/oauth2.js
@@ -19,10 +20,14 @@ export class LoginByGoogleController {
 
   @GuardByGoogle()
   @Get('login-by-google')
+  @ApiOperation({summary: 'Initiate Google OAuth login (redirect)'})
+  @ApiResponse({type: String})
   async signinWithGoogle() {}
 
   @GuardByGoogle()
   @Get('login-by-google/redirect')
+  @ApiOperation({summary: 'Google OAuth redirect callback'})
+  @ApiResponse({type: GoogleOAuthRedirectResponseDto})
   async googleOAuthredirect(@Req() req) {
     if (!req.user) return new NotFoundException('User google account not found');
     return {

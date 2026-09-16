@@ -1,33 +1,49 @@
-import {ApiProperty} from '@nestjs/swagger';
+import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
+import {UserRole} from '@generated/prisma/client';
 import {IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, MinLength} from 'class-validator';
 
 export class GetCurrentUserResponseDto {
   @ApiProperty({type: String})
   id: string;
 
-  @ApiProperty({type: String})
-  email: string;
+  @ApiPropertyOptional({type: String})
+  email?: string | null;
 
-  @ApiProperty({type: String})
-  phone: string;
+  @ApiPropertyOptional({type: String})
+  phone?: string | null;
 
   @ApiProperty({type: String, isArray: true})
-  roles: string[];
+  roles: UserRole[];
 
+  @ApiPropertyOptional({type: String})
+  name?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  firstName?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  middleName?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  lastName?: string | null;
+
+  @ApiPropertyOptional({type: String})
+  avatarFileId?: string | null;
+}
+
+/**
+ * Response DTO for password change / reset operations.
+ * Only returns non-sensitive identity fields.
+ */
+export class PasswordChangeResponseDto {
   @ApiProperty({type: String})
-  name: string;
+  id: string;
 
-  @ApiProperty({type: String})
-  firstName: string;
+  @ApiPropertyOptional({type: String})
+  email?: string | null;
 
-  @ApiProperty({type: String})
-  middleName: string;
-
-  @ApiProperty({type: String})
-  lastName: string;
-
-  @ApiProperty({type: Object, isArray: true})
-  memberships: Object[];
+  @ApiPropertyOptional({type: String})
+  phone?: string | null;
 }
 
 export class ResendEmailVerificationDto {

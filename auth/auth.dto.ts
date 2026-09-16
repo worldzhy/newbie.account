@@ -102,6 +102,36 @@ export class LoginByPasswordResponseDto {
   tokenExpiresInSeconds: number;
 }
 
+/**
+ * Response DTO for Google OAuth redirect callback.
+ */
+export class GoogleOAuthRedirectResponseDto {
+  @ApiProperty({type: String})
+  status: string;
+
+  @ApiProperty({type: String})
+  message: string;
+
+  @ApiProperty({type: Object})
+  data: object;
+}
+
+/**
+ * Response DTO for sending verification code.
+ */
+export class SendVerificationCodeResponseDto {
+  @ApiProperty({type: Number})
+  secondsOfCountdown: number;
+}
+
+/**
+ * Response DTO for logout operation.
+ */
+export class LogoutResponseDto {
+  @ApiProperty({type: Object})
+  data: {message: string};
+}
+
 export class TotpLoginDto {
   @IsString()
   @IsNotEmpty()

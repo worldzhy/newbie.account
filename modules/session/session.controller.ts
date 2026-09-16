@@ -9,11 +9,11 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import {ApiBearerAuth, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Prisma, Session} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {Expose, expose} from '../../helpers/expose';
-import {SessionsListRequestDto, SessionsListResponseDto} from './session.dto';
+import {SessionResponseDto, SessionsListRequestDto, SessionsListResponseDto} from './session.dto';
 import {SESSION_NOT_FOUND, UNAUTHORIZED_RESOURCE} from '@framework/exceptions/errors.constants';
 import {UserRequest} from '../../account.interface';
 
@@ -25,6 +25,7 @@ export class SessionController {
 
   /** Get sessions for a user */
   @Get()
+  @ApiOperation({summary: 'Get sessions for a user'})
   @ApiResponse({type: SessionsListResponseDto})
   async getAll(
     @Req() req: UserRequest,
@@ -53,6 +54,8 @@ export class SessionController {
 
   /** Get a session for a user */
   @Get(':id')
+  @ApiOperation({summary: 'Get a session by id'})
+  @ApiResponse({type: SessionResponseDto})
   async get(
     @Req() req: UserRequest,
     @Param('userId') userId: string,
@@ -72,6 +75,8 @@ export class SessionController {
 
   /** Delete a session for a user */
   @Delete(':id')
+  @ApiOperation({summary: 'Delete a session'})
+  @ApiResponse({type: SessionResponseDto})
   async remove(@Param('userId') userId: string, @Param('id', ParseIntPipe) id: number): Promise<Expose<Session>> {
     const testSession = await this.prisma.session.findUnique({where: {id}});
     if (!testSession) throw new NotFoundException(SESSION_NOT_FOUND);

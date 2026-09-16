@@ -1,7 +1,8 @@
 import {Controller, Get, Param, Query} from '@nestjs/common';
 import {Prisma} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
+import {AuditLogListResponseDto} from './audit-log.dto';
 
 @ApiTags('Account / Audit Log')
 @ApiBearerAuth()
@@ -11,6 +12,8 @@ export class AuditLogController {
 
   /** Get audit logs for a team */
   @Get('organizations/:organizationId/audit-logs')
+  @ApiOperation({summary: 'Get audit logs for an organization'})
+  @ApiResponse({type: AuditLogListResponseDto})
   async getAuditLogsByOrganization(
     @Param('organizationId') organizationId: string,
     @Query('page') page: number,
@@ -25,6 +28,8 @@ export class AuditLogController {
 
   /** Get audit logs for a user */
   @Get('users/:userId/audit-logs')
+  @ApiOperation({summary: 'Get audit logs for a user'})
+  @ApiResponse({type: AuditLogListResponseDto})
   async getAuditLogsByUser(
     @Param('userId') userId: string,
     @Query('page') page: number,

@@ -1,5 +1,5 @@
 import {Controller, Post, Body, Ip} from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {SignUpDto} from '@microservices/account/auth/auth.dto';
 import {NoGuard} from '@microservices/account/security/passport/public/public.decorator';
@@ -18,6 +18,8 @@ export class SignupController {
    */
   @NoGuard()
   @Post('signup')
+  @ApiOperation({summary: 'Sign up a new user'})
+  @ApiResponse({type: String})
   async signup(@Ip() ipAddress: string, @Body() body: SignUpDto) {
     await this.authService.signup({userData: body, ipAddress});
   }

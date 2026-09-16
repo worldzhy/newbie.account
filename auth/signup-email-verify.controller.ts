@@ -1,5 +1,5 @@
 import {Controller, Post, Body, UnprocessableEntityException, NotFoundException} from '@nestjs/common';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {NO_TOKEN_PROVIDED, EMAIL_NOT_FOUND} from '@framework/exceptions/errors.constants';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
@@ -16,6 +16,8 @@ export class SignupEmailVerifyController {
 
   @Post('signup-email-verify')
   @NoGuard()
+  @ApiOperation({summary: 'Verify email after signup via token'})
+  @ApiResponse({type: Boolean})
   async approveSubnet(@Body('token') token: string) {
     // [step 1] Verify token
     if (!token) throw new UnprocessableEntityException(NO_TOKEN_PROVIDED);

@@ -1,7 +1,8 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Query} from '@nestjs/common';
-import {ApiBearerAuth, ApiBody, ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Permission, PermissionAction, Prisma} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
+import {PermissionListResponseDto, PermissionResponseDto} from './permission.dto';
 
 @ApiTags('Account / Permission')
 @ApiBearerAuth()
@@ -10,16 +11,22 @@ export class PermissionController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Get('resources')
+  @ApiOperation({summary: 'List all permission resource names'})
+  @ApiResponse({type: String, isArray: true})
   listPermissionResources() {
     return Object.values(Prisma.ModelName);
   }
 
   @Get('actions')
+  @ApiOperation({summary: 'List all permission action names'})
+  @ApiResponse({type: String, isArray: true})
   listPermissionActions() {
     return Object.values(PermissionAction);
   }
 
   @Post('')
+  @ApiOperation({summary: 'Create a permission'})
+  @ApiResponse({type: PermissionResponseDto})
   @ApiBody({
     description: "The 'name' is required in request body.",
     examples: {
@@ -41,6 +48,8 @@ export class PermissionController {
   }
 
   @Get('')
+  @ApiOperation({summary: 'Get permissions with pagination and optional resource filter'})
+  @ApiResponse({type: PermissionListResponseDto})
   async getPermissions(
     @Query('page') page: number,
     @Query('pageSize') pageSize: number,
@@ -69,6 +78,8 @@ export class PermissionController {
   }
 
   @Get(':permissionId')
+  @ApiOperation({summary: 'Get a permission by id'})
+  @ApiResponse({type: PermissionResponseDto})
   async getPermission(@Param('permissionId') permissionId: number): Promise<Permission> {
     return await this.prisma.permission.findUniqueOrThrow({
       where: {id: permissionId},
@@ -76,6 +87,8 @@ export class PermissionController {
   }
 
   @Patch(':permissionId')
+  @ApiOperation({summary: 'Update a permission'})
+  @ApiResponse({type: PermissionResponseDto})
   @ApiBody({
     description: '',
     examples: {
@@ -101,6 +114,8 @@ export class PermissionController {
   }
 
   @Delete(':permissionId')
+  @ApiOperation({summary: 'Delete a permission'})
+  @ApiResponse({type: PermissionResponseDto})
   async deletePermission(@Param('permissionId') permissionId: number): Promise<Permission> {
     return await this.prisma.permission.delete({
       where: {id: permissionId},
