@@ -1,7 +1,7 @@
 import {BadRequestException, Body, Controller, Get, Patch, Post, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Request} from 'express';
-import {Prisma} from '@generated/prisma/client';
+import {Prisma, VerificationCodeUse} from '@generated/prisma/client';
 import {NewbieException, NewbieExceptionType} from '@framework/exceptions/newbie.exception';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {compareHash} from '@framework/utilities/common.util';
@@ -13,6 +13,7 @@ import {
   ChangePasswordDto,
   GetCurrentUserResponseDto,
   PasswordChangeResponseDto,
+  ResetPasswordDto,
 } from '@microservices/account/account.dto';
 
 @ApiTags('Account')
@@ -99,15 +100,17 @@ export class AccountController {
   })
   async resetPassword(
     @Body()
-    body: {
-      email?: string;
-      phone?: string;
-      verificationCode: string;
-      newPassword: string;
-    }
+    body: ResetPasswordDto
   ) {
     if (body.email && verifyEmail(body.email)) {
-      if (await this.verificationCodeService.validateForEmail(body.verificationCode, body.email)) {
+      // Only a code issued for resetting password can complete the reset.
+      if (
+        await this.verificationCodeService.validateForEmail(
+          body.verificationCode,
+          body.email,
+          VerificationCodeUse.RESET_PASSWORD
+        )
+      ) {
         return await this.prisma.user.update({
           where: {email: body.email.toLowerCase()},
           data: {password: body.newPassword},
@@ -117,7 +120,14 @@ export class AccountController {
         throw new NewbieException(NewbieExceptionType.ResetPassword_InvalidCode);
       }
     } else if (body.phone && verifyPhone(body.phone)) {
-      if (await this.verificationCodeService.validateForPhone(body.verificationCode, body.phone)) {
+      // Only a code issued for resetting password can complete the reset.
+      if (
+        await this.verificationCodeService.validateForPhone(
+          body.verificationCode,
+          body.phone,
+          VerificationCodeUse.RESET_PASSWORD
+        )
+      ) {
         return await this.prisma.user.update({
           where: {phone: body.phone},
           data: {password: body.newPassword},

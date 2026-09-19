@@ -21,10 +21,12 @@ export class VerificationCodeService {
   }
 
   async generateForEmail(email: string, use: VerificationCodeUse): Promise<VerificationCode> {
-    // [step 1] Return verification code generated within 1 minute.
+    // [step 1] Return the verification code of the same purpose generated within the resend window.
+    // Codes are scoped by 'use', so a login code and a reset-password code never collide.
     const validCode = await this.prisma.verificationCode.findFirst({
       where: {
         email: {equals: email, mode: 'insensitive'},
+        use: use,
         status: VerificationCodeStatus.ACTIVE,
         expiredAt: {
           gte: currentPlusMinutes(this.timeoutMinutes - this.resendMinutes),
@@ -35,11 +37,12 @@ export class VerificationCodeService {
       return validCode;
     }
 
-    // [step 2] Inactive current valid verification codes.
+    // [step 2] Inactive current valid verification codes of the same purpose.
     await this.prisma.verificationCode.updateMany({
       where: {
         AND: {
           email: {equals: email, mode: 'insensitive'},
+          use: use,
           status: VerificationCodeStatus.ACTIVE,
         },
       },
@@ -60,10 +63,12 @@ export class VerificationCodeService {
   }
 
   async generateForPhone(phone: string, use: VerificationCodeUse): Promise<VerificationCode> {
-    // [step 1] Return verification code generated within 1 minute.
+    // [step 1] Return the verification code of the same purpose generated within the resend window.
+    // Codes are scoped by 'use', so a login code and a reset-password code never collide.
     const validCode = await this.prisma.verificationCode.findFirst({
       where: {
         phone: phone,
+        use: use,
         status: VerificationCodeStatus.ACTIVE,
         expiredAt: {
           gte: currentPlusMinutes(this.timeoutMinutes - this.resendMinutes),
@@ -74,9 +79,9 @@ export class VerificationCodeService {
       return validCode;
     }
 
-    // [step 2] Inactive current valid verification codes.
+    // [step 2] Inactive current valid verification codes of the same purpose.
     await this.prisma.verificationCode.updateMany({
-      where: {AND: {phone: phone, status: VerificationCodeStatus.ACTIVE}},
+      where: {AND: {phone: phone, use: use, status: VerificationCodeStatus.ACTIVE}},
       data: {status: VerificationCodeStatus.INACTIVE},
     });
 
@@ -95,11 +100,12 @@ export class VerificationCodeService {
     });
   }
 
-  async validateForEmail(code: string, email: string): Promise<boolean> {
+  async validateForEmail(code: string, email: string, use: VerificationCodeUse): Promise<boolean> {
     const existedCode = await this.prisma.verificationCode.findFirst({
       where: {
         email: {equals: email, mode: 'insensitive'},
         code: code,
+        use: use,
         status: VerificationCodeStatus.ACTIVE,
         expiredAt: {
           gte: new Date(),
@@ -109,11 +115,12 @@ export class VerificationCodeService {
     return existedCode ? true : false;
   }
 
-  async validateForPhone(code: string, phone: string): Promise<boolean> {
+  async validateForPhone(code: string, phone: string, use: VerificationCodeUse): Promise<boolean> {
     const existedCode = await this.prisma.verificationCode.findFirst({
       where: {
         phone: phone,
         code: code,
+        use: use,
         status: VerificationCodeStatus.ACTIVE,
         expiredAt: {
           gte: new Date(),

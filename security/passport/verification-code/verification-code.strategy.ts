@@ -1,6 +1,7 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PassportStrategy} from '@nestjs/passport';
 import {Strategy} from 'passport-local';
+import {VerificationCodeUse} from '@generated/prisma/client';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {UserService} from '@microservices/account/modules/user/user.service';
 import {verifyEmail, verifyPhone} from '@microservices/account/helpers/validator';
@@ -35,9 +36,18 @@ export class VerificationCodeStrategy extends PassportStrategy(Strategy, 'local.
     }
 
     // [step 3] Validate verification code.
+    // Only a code issued for the login purpose can complete the login.
     const isCodeValid = verifyEmail(account)
-      ? await this.verificationCodeService.validateForEmail(verificationCode, account)
-      : await this.verificationCodeService.validateForPhone(verificationCode, account);
+      ? await this.verificationCodeService.validateForEmail(
+          verificationCode,
+          account,
+          VerificationCodeUse.LOGIN_BY_EMAIL
+        )
+      : await this.verificationCodeService.validateForPhone(
+          verificationCode,
+          account,
+          VerificationCodeUse.LOGIN_BY_PHONE
+        );
     if (!isCodeValid) {
       throw new UnauthorizedException('Invalid code.');
     }

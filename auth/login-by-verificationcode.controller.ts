@@ -12,7 +12,12 @@ import {UserService} from '@microservices/account/modules/user/user.service';
 import {VerificationCodeService} from '@microservices/account/modules/verification-code/verification-code.service';
 import {AwsSesService} from '@microservices/aws-ses/aws-ses.service';
 import {AwsSmsService} from '@microservices/aws-sms/aws-sms.service';
-import {LoginByPasswordResponseDto, SendVerificationCodeResponseDto} from '@microservices/account/auth/auth.dto';
+import {
+  LoginByPasswordResponseDto,
+  LoginByVerificationCodeRequestDto,
+  SendVerificationCodeRequestDto,
+  SendVerificationCodeResponseDto,
+} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -58,9 +63,7 @@ export class LoginByVerificationCodeController {
       },
     },
   })
-  async sendVerificationCode(
-    @Body() body: {email?: string; phone?: string; use: VerificationCodeUse}
-  ): Promise<{secondsOfCountdown: number}> {
+  async sendVerificationCode(@Body() body: SendVerificationCodeRequestDto): Promise<{secondsOfCountdown: number}> {
     if (body.email && verifyEmail(body.email)) {
       // [step 1] Check if the account exists.
       const user = await this.userService.findByAccount(body.email);
@@ -78,7 +81,8 @@ export class LoginByVerificationCodeController {
           'auth/verification-code': {
             userName: 'Dear',
             code: verificationCode.code,
-            codeValidMinutes: 10,
+            // Follow the configured validity so the email never claims a wrong window.
+            codeValidMinutes: this.verificationCodeService.timeoutMinutes,
           },
         },
       });
@@ -101,8 +105,9 @@ export class LoginByVerificationCodeController {
       throw new NewbieException(NewbieExceptionType.ResetPassword_WrongInput);
     }
 
+    // Countdown before the user can request a new code (the resend cooldown window).
     return {
-      secondsOfCountdown: this.verificationCodeService.timeoutMinutes * 60,
+      secondsOfCountdown: this.verificationCodeService.resendMinutes * 60,
     };
   }
 
@@ -142,7 +147,7 @@ export class LoginByVerificationCodeController {
   async loginByVerificationCode(
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,
-    @Body() body: {account: string; verificationCode: string},
+    @Body() body: LoginByVerificationCodeRequestDto,
     @Req() request: UserRequest,
     @Res({passthrough: true}) response: Response
   ): Promise<{token: string; tokenExpiresInSeconds: number}> {

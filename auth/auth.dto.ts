@@ -1,5 +1,5 @@
 import {ApiProperty} from '@nestjs/swagger';
-import {UserRole} from '@generated/prisma/client';
+import {UserRole, VerificationCodeUse} from '@generated/prisma/client';
 import {Type} from 'class-transformer';
 import {
   IsArray,
@@ -122,6 +122,46 @@ export class GoogleOAuthRedirectResponseDto {
 export class SendVerificationCodeResponseDto {
   @ApiProperty({type: Number})
   secondsOfCountdown: number;
+}
+
+/**
+ * Request DTO for sending verification code to email or phone.
+ */
+export class SendVerificationCodeRequestDto {
+  @ApiProperty({type: String, required: false, description: 'The email address to send the code to.'})
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @ApiProperty({type: String, required: false, description: 'The phone number to send the code to.'})
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiProperty({
+    type: String,
+    required: true,
+    description: 'The purpose of the verification code (e.g. LOGIN_BY_EMAIL, RESET_PASSWORD).',
+    enum: VerificationCodeUse,
+  })
+  @IsString()
+  @IsNotEmpty()
+  use: VerificationCodeUse;
+}
+
+/**
+ * Request DTO for logging in with a verification code.
+ */
+export class LoginByVerificationCodeRequestDto {
+  @ApiProperty({type: String, required: true, description: 'The account (email or phone).'})
+  @IsString()
+  @IsNotEmpty()
+  account: string;
+
+  @ApiProperty({type: String, required: true, description: 'The 6-digit verification code.'})
+  @IsString()
+  @IsNotEmpty()
+  verificationCode: string;
 }
 
 /**
