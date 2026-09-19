@@ -78,6 +78,7 @@ export class AccountController {
   @ApiOperation({summary: 'Reset password with email or phone verification code'})
   @ApiResponse({type: PasswordChangeResponseDto})
   @ApiBody({
+    type: ResetPasswordDto,
     description: '',
     examples: {
       a: {

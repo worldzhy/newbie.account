@@ -1,7 +1,8 @@
-import {Controller, Post, Body} from '@nestjs/common';
+import {Controller, Post} from '@nestjs/common';
 import {ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {GuardByApiKey} from '@microservices/account/security/passport/api-key/api-key.decorator';
 import {TokenService} from '@microservices/account/security/token/token.service';
+import {LoginByApiKeyRequestDto} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -22,6 +23,7 @@ export class LoginByApiKeyController {
   @ApiOperation({summary: 'Login with API key and secret'})
   @ApiResponse({type: String})
   @ApiBody({
+    type: LoginByApiKeyRequestDto,
     description: "The request body should contain 'key' and 'secret' attributes.",
     examples: {
       a: {
@@ -33,7 +35,7 @@ export class LoginByApiKeyController {
       },
     },
   })
-  async loginByApiKey(@Body() body: {key: string; secret: string}) {
+  async loginByApiKey() {
     // [step 1] Disable active JSON web token if existed.
     // await this.tokenService.invalidate(body.key);
     // [step 2] Generate new tokens.

@@ -38,6 +38,7 @@ export class LoginByVerificationCodeController {
   @ApiOperation({summary: 'Send verification code to email or phone'})
   @ApiResponse({type: SendVerificationCodeResponseDto})
   @ApiBody({
+    type: SendVerificationCodeRequestDto,
     description: '',
     examples: {
       a: {
@@ -125,6 +126,7 @@ export class LoginByVerificationCodeController {
   @ApiOperation({summary: 'Login with verification code'})
   @ApiResponse({type: LoginByPasswordResponseDto})
   @ApiBody({
+    type: LoginByVerificationCodeRequestDto,
     description:
       "The request body must contain 'account' and 'verificationCode' attributes. The 'account' accepts email or phone.",
     examples: {

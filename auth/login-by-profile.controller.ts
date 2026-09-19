@@ -1,11 +1,15 @@
-import {Controller, Post, Body, Res, Ip, Headers, Req} from '@nestjs/common';
+import {Controller, Post, Res, Ip, Headers, Req} from '@nestjs/common';
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Response} from 'express';
 import {UserRequest} from '@microservices/account/account.interface';
 import {AuthService} from '@microservices/account/auth/auth.service';
 import {GuardByProfile} from '@microservices/account/security/passport/profile/profile.decorator';
 import {GuardByUuid} from '@microservices/account/security/passport/uuid/uuid.decorator';
-import {LoginByPasswordResponseDto} from '@microservices/account/auth/auth.dto';
+import {
+  LoginByPasswordResponseDto,
+  LoginByProfileRequestDto,
+  LoginByUuidRequestDto,
+} from '@microservices/account/auth/auth.dto';
 
 @ApiTags('Account / Auth')
 @Controller('auth')
@@ -22,6 +26,7 @@ export class LoginByProfileController {
   @ApiOperation({summary: 'Login with user profile information'})
   @ApiResponse({type: LoginByPasswordResponseDto})
   @ApiBody({
+    type: LoginByProfileRequestDto,
     description:
       "The request body should contain 'firstName', 'middleName', 'lastName' and 'dateOfBirth' attributes. The 'suffix' is optional.",
     examples: {
@@ -47,14 +52,6 @@ export class LoginByProfileController {
     },
   })
   async loginByUserProfile(
-    @Body()
-    body: {
-      firstName: string;
-      middleName: string;
-      lastName: string;
-      suffix?: string;
-      dateOfBirth: Date;
-    },
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,
     @Req() request: UserRequest,
@@ -74,6 +71,7 @@ export class LoginByProfileController {
   @ApiOperation({summary: 'Login with UUID'})
   @ApiResponse({type: LoginByPasswordResponseDto})
   @ApiBody({
+    type: LoginByUuidRequestDto,
     description: 'Verfiy account by uuid.',
     examples: {
       a: {
@@ -85,7 +83,6 @@ export class LoginByProfileController {
     },
   })
   async loginByUuid(
-    @Body() body: {uuid: string},
     @Ip() ipAddress: string,
     @Headers('User-Agent') userAgent: string,
     @Req() request: UserRequest,

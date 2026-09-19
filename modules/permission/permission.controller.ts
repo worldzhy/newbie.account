@@ -2,7 +2,12 @@ import {Body, Controller, Delete, Get, Param, Patch, Post, Query} from '@nestjs/
 import {ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags} from '@nestjs/swagger';
 import {Permission, PermissionAction, Prisma} from '@generated/prisma/client';
 import {PrismaService} from '@framework/prisma/prisma.service';
-import {PermissionListResponseDto, PermissionResponseDto} from './permission.dto';
+import {
+  PermissionListResponseDto,
+  PermissionResponseDto,
+  CreatePermissionDto,
+  UpdatePermissionDto,
+} from './permission.dto';
 
 @ApiTags('Account / Permission')
 @ApiBearerAuth()
@@ -28,6 +33,7 @@ export class PermissionController {
   @ApiOperation({summary: 'Create a permission'})
   @ApiResponse({type: PermissionResponseDto})
   @ApiBody({
+    type: CreatePermissionDto,
     description: "The 'name' is required in request body.",
     examples: {
       a: {
@@ -41,9 +47,10 @@ export class PermissionController {
       },
     },
   })
-  async createPermission(@Body() body: Prisma.PermissionCreateInput): Promise<Permission> {
+  async createPermission(@Body() body: CreatePermissionDto): Promise<Permission> {
+    // Cast: the validated DTO is a flat scalar object that matches the Prisma create input.
     return await this.prisma.permission.create({
-      data: body,
+      data: body as Prisma.PermissionCreateInput,
     });
   }
 
@@ -90,6 +97,7 @@ export class PermissionController {
   @ApiOperation({summary: 'Update a permission'})
   @ApiResponse({type: PermissionResponseDto})
   @ApiBody({
+    type: UpdatePermissionDto,
     description: '',
     examples: {
       a: {
@@ -105,11 +113,12 @@ export class PermissionController {
   async updatePermission(
     @Param('permissionId') permissionId: number,
     @Body()
-    body: Prisma.PermissionUpdateInput
+    body: UpdatePermissionDto
   ): Promise<Permission> {
+    // Cast: the validated DTO is a flat scalar object that matches the Prisma update input.
     return await this.prisma.permission.update({
       where: {id: permissionId},
-      data: body,
+      data: body as Prisma.PermissionUpdateInput,
     });
   }
 

@@ -1,4 +1,4 @@
-import {ApiProperty} from '@nestjs/swagger';
+import {ApiProperty, ApiPropertyOptional} from '@nestjs/swagger';
 import {UserRole, VerificationCodeUse} from '@generated/prisma/client';
 import {Type} from 'class-transformer';
 import {
@@ -10,6 +10,7 @@ import {
   IsOptional,
   IsPhoneNumber,
   IsString,
+  IsUUID,
   Length,
   MinLength,
 } from 'class-validator';
@@ -162,6 +163,63 @@ export class LoginByVerificationCodeRequestDto {
   @IsString()
   @IsNotEmpty()
   verificationCode: string;
+}
+
+/**
+ * Request DTO for logging in with an API key and secret.
+ * Note: the ApiKey guard actually reads key/secret from request headers;
+ * this DTO only documents the request body contract for OpenAPI clients.
+ */
+export class LoginByApiKeyRequestDto {
+  @ApiProperty({type: String, required: true, description: 'The API key.'})
+  @IsString()
+  @IsNotEmpty()
+  key: string;
+
+  @ApiProperty({type: String, required: true, description: 'The API secret.'})
+  @IsString()
+  @IsNotEmpty()
+  secret: string;
+}
+
+/**
+ * Request DTO for logging in with a user profile.
+ * The Profile guard runs before the validation pipe and reads the raw body.
+ */
+export class LoginByProfileRequestDto {
+  @ApiProperty({type: String, required: true})
+  @IsString()
+  @IsNotEmpty()
+  firstName: string;
+
+  @ApiProperty({type: String, required: true})
+  @IsString()
+  @IsNotEmpty()
+  middleName: string;
+
+  @ApiProperty({type: String, required: true})
+  @IsString()
+  @IsNotEmpty()
+  lastName: string;
+
+  @ApiPropertyOptional({type: String, description: 'Optional name suffix, e.g. PhD.'})
+  @IsString()
+  @IsOptional()
+  suffix?: string;
+
+  @ApiProperty({type: Date, required: true, description: 'ISO 8601 date string.'})
+  @IsDate()
+  @Type(() => Date)
+  dateOfBirth: Date;
+}
+
+/**
+ * Request DTO for logging in with a user UUID.
+ */
+export class LoginByUuidRequestDto {
+  @ApiProperty({type: String, required: true, description: 'The UUID (user id).'})
+  @IsUUID()
+  uuid: string;
 }
 
 /**

@@ -6,7 +6,15 @@ import {compareHash} from '@framework/utilities/common.util';
 import {PrismaService} from '@framework/prisma/prisma.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {UserService} from './user.service';
-import {CreateUserResponseDto, UserChangePasswordResponseDto, UserListResponseDto, UserResponseDto} from './user.dto';
+import {
+  ChangeUserPasswordDto,
+  CreateUserResponseDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserChangePasswordResponseDto,
+  UserListResponseDto,
+  UserResponseDto,
+} from './user.dto';
 import {Request} from 'express';
 
 @ApiTags('Account / User')
@@ -23,10 +31,11 @@ export class UserController {
   @RequirePermission(PermissionAction.Create, Prisma.ModelName.User)
   @ApiOperation({summary: 'Create a new user'})
   @ApiResponse({type: CreateUserResponseDto})
-  async createUser(@Body() body: Prisma.UserCreateInput) {
-    // [step 1] Create the user.
+  async createUser(@Body() body: CreateUserDto) {
+    // [step 1] Create the user. Cast: the validated DTO matches the Prisma create input
+    // for scalar columns (roles as a plain enum array is valid on create).
     const user = await this.prisma.user.create({
-      data: body,
+      data: body as Prisma.UserCreateInput,
       select: {
         id: true,
         email: true,
@@ -127,7 +136,8 @@ export class UserController {
   @ApiOperation({summary: 'Update a user'})
   @ApiResponse({type: UserResponseDto})
   @ApiBody({
-    description: 'Set roleIds with an empty array to remove all the roles of the user.',
+    type: UpdateUserDto,
+    description: 'Set roles with an empty array to remove all the roles of the user.',
     examples: {
       a: {
         summary: '1. Update',
@@ -141,10 +151,18 @@ export class UserController {
       },
     },
   })
-  async updateUser(@Param('userId') userId: string, @Body() body: Prisma.UserUpdateInput) {
+  async updateUser(@Param('userId') userId: string, @Body() body: UpdateUserDto) {
+    // Prisma requires scalar list updates to use {set: [...]}, while the DTO
+    // accepts a plain enum array. Empty array clears all roles.
+    const {roles, ...scalarFields} = body;
+    const data: Prisma.UserUpdateInput = scalarFields as Prisma.UserUpdateInput;
+    if (roles !== undefined) {
+      data.roles = {set: roles};
+    }
+
     const user = await this.prisma.user.update({
       where: {id: userId},
-      data: body,
+      data,
     });
 
     // Strip the password hash from the response to prevent sensitive data leakage.
@@ -178,7 +196,8 @@ export class UserController {
   @ApiOperation({summary: "Change a user's password"})
   @ApiResponse({type: UserChangePasswordResponseDto})
   @ApiBody({
-    description: "The 'userId', 'currentPassword' and 'newPassword' are required in request body.",
+    type: ChangeUserPasswordDto,
+    description: "The 'currentPassword' and 'newPassword' are required in request body.",
     examples: {
       a: {
         summary: '1. new password != current password',
@@ -187,27 +206,15 @@ export class UserController {
           newPassword: '',
         },
       },
-      b: {
-        summary: '2. new password == current password',
-        value: {
-          currentPassword: '',
-          newPassword: '',
-        },
-      },
     },
   })
-  async changePassword(@Param('userId') userId: string, @Body() body: {currentPassword: string; newPassword: string}) {
-    // [step 1] Guard statement.
-    if (!('currentPassword' in body) || !('newPassword' in body)) {
-      throw new BadRequestException("Please carry 'currentPassword' and 'newPassword' in the request body.");
-    }
-
-    // [step 2] Verify if the new password is same with the current password.
+  async changePassword(@Param('userId') userId: string, @Body() body: ChangeUserPasswordDto) {
+    // [step 1] Verify if the new password is same with the current password.
     if (body.currentPassword.trim() === body.newPassword.trim()) {
       throw new BadRequestException('The new password is same with the current password.');
     }
 
-    // [step 3] Verify the current password.
+    // [step 2] Verify the current password.
     const user = await this.prisma.user.findUniqueOrThrow({
       where: {id: userId},
     });
@@ -216,7 +223,7 @@ export class UserController {
       throw new BadRequestException('The current password is incorrect.');
     }
 
-    // [step 4] Change password.
+    // [step 3] Change password (the Prisma extension validates strength and hashes it).
     return await this.prisma.user.update({
       where: {id: userId},
       data: {password: body.newPassword},
