@@ -151,7 +151,7 @@ export class UpdateUserDto {
   @IsOptional()
   email?: string | null;
 
-  @ApiPropertyOptional({type: String})
+  @ApiPropertyOptional({type: String, nullable: true})
   @IsPhoneNumber()
   @IsOptional()
   phone?: string | null;
@@ -181,7 +181,7 @@ export class UpdateUserDto {
   @IsOptional()
   firstName?: string | null;
 
-  @ApiPropertyOptional({type: String})
+  @ApiPropertyOptional({type: String, nullable: true})
   @IsString()
   @IsOptional()
   middleName?: string | null;
