@@ -37,10 +37,7 @@ export class RouteAuthenticationService {
     });
   }
 
-  private matchMethod(
-    definedMethod: RequestMethod,
-    requestMethod: string
-  ): boolean {
+  private matchMethod(definedMethod: RequestMethod, requestMethod: string): boolean {
     switch (definedMethod) {
       case RequestMethod.GET:
         return requestMethod === 'GET';
@@ -110,11 +107,7 @@ export class RouteAuthenticationService {
     });
   }
 
-  private addRouteGuardConfig(
-    path: string,
-    method: RequestMethod | 'ALL',
-    guard: GuardType
-  ) {
+  private addRouteGuardConfig(path: string, method: RequestMethod | 'ALL', guard: GuardType) {
     this.routeGuardConfigs.push({path, method, guard});
   }
 

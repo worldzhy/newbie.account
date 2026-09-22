@@ -45,8 +45,7 @@ export class RouteAuthorizationGuard implements CanActivate {
         const permission = rolePermissions[i];
         if (
           permission.resource === requiredPermission.resource &&
-          (permission.action === requiredPermission.action ||
-            permission.action === PermissionAction.Manage)
+          (permission.action === requiredPermission.action || permission.action === PermissionAction.Manage)
         ) {
           return true;
         }
@@ -60,8 +59,7 @@ export class RouteAuthorizationGuard implements CanActivate {
       const permission = userPermissions[i];
       if (
         permission.resource === requiredPermission.resource &&
-        (permission.action === requiredPermission.action ||
-          permission.action === PermissionAction.Manage)
+        (permission.action === requiredPermission.action || permission.action === PermissionAction.Manage)
       ) {
         return true;
       }

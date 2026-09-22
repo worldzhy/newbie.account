@@ -144,7 +144,11 @@ export class ApiKeyService {
     return expose<ApiKey>(apiKey);
   }
 
-  async updateApiKeyForOrganization(organizationId: string, id: number, data: Prisma.ApiKeyUpdateInput): Promise<Expose<ApiKey>> {
+  async updateApiKeyForOrganization(
+    organizationId: string,
+    id: number,
+    data: Prisma.ApiKeyUpdateInput
+  ): Promise<Expose<ApiKey>> {
     const testApiKey = await this.prisma.apiKey.findUnique({
       where: {id},
     });

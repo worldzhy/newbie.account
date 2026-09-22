@@ -83,10 +83,7 @@ export class RouteAuthorizationService {
     this.routeConfigs.push({path, method, permission, policy});
   }
 
-  getPermissionForRoute(
-    url: string,
-    method: string
-  ): RoutePermissionRequirement | null {
+  getPermissionForRoute(url: string, method: string): RoutePermissionRequirement | null {
     const config = this.routeConfigs.find(config => {
       if (!url.includes(config.path)) {
         return false;
@@ -100,10 +97,7 @@ export class RouteAuthorizationService {
     return config && config.permission ? config.permission : null;
   }
 
-  getPolicyForRoute(
-    url: string,
-    method: string
-  ): RouteAuthorizationPolicy | null {
+  getPolicyForRoute(url: string, method: string): RouteAuthorizationPolicy | null {
     const config = this.routeConfigs.find(config => {
       if (!url.includes(config.path)) {
         return false;
@@ -116,10 +110,7 @@ export class RouteAuthorizationService {
     return config && config.policy ? config.policy : null;
   }
 
-  private matchMethod(
-    definedMethod: RequestMethod,
-    requestMethod: string
-  ): boolean {
+  private matchMethod(definedMethod: RequestMethod, requestMethod: string): boolean {
     switch (definedMethod) {
       case RequestMethod.GET:
         return requestMethod === 'GET';

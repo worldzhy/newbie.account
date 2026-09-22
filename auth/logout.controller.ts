@@ -1,10 +1,7 @@
 import {Controller, Post, Req, Res} from '@nestjs/common';
 import {ApiOperation, ApiResponse, ApiTags, ApiBearerAuth} from '@nestjs/swagger';
 import {Response} from 'express';
-import {
-  CookieName,
-  CookieService,
-} from '@microservices/account/security/cookie/cookie.service';
+import {CookieName, CookieService} from '@microservices/account/security/cookie/cookie.service';
 import {TokenService} from '@microservices/account/security/token/token.service';
 import {LimitLoginByUserService} from '@microservices/account/security/rate-limiter/rate-limiter.service';
 import {SessionService} from '@microservices/account/modules/session/session.service';
@@ -24,10 +21,7 @@ export class LogoutController {
   @ApiBearerAuth()
   @ApiOperation({summary: 'Logout the current user'})
   @ApiResponse({type: LogoutResponseDto})
-  async logout(
-    @Req() req,
-    @Res({passthrough: true}) response: Response
-  ): Promise<{data: {message: string}}> {
+  async logout(@Req() req, @Res({passthrough: true}) response: Response): Promise<{data: {message: string}}> {
     // [step 1] Get access token.
     const accessToken = this.tokenService.getTokenFromHttpRequest(req);
 
